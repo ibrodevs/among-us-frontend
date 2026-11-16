@@ -14,6 +14,7 @@
 | `playwright test --grep 'responsive\|4 real browsers'` | 2 PASS: 1440/768/390/360px, настоящий touch, матч4, offline→reconnect, восстановление роли, победа экипажа |
 | `playwright test --grep '10 real browsers'` | PASS: 10 независимых browser contexts, одновременное движение, reconnect, два собрания, победа экипажа |
 | `playwright test --grep 'all three real task'` | PASS: три мини-игры у терминалов, убийство, Report, Skip, правильный cooldown после собрания, победа предателя |
+| `playwright test --grep 'room form'` | PASS: валидация формы, настоящий404, истёкшая сессия и восстановление |
 | Backend `manage.py test` | 67 PASS на PostgreSQL16, без пропусков |
 | Backend migration drift / `check --deploy` / `pip check` | PASS |
 | `scripts/check_map.py` | JSON карты совпадает байт-в-байт |

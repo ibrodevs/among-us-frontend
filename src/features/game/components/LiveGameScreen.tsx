@@ -230,7 +230,7 @@ export function LiveGameScreen({ code }: { code: string }) {
               </button>
             </div>
           </section>
-          <aside className={styles.hud}>
+          <aside className={`${styles.hud} ${styles.liveHud}`}>
             <h2>Состояние миссии</h2>
             <p>
               {snapshot.tasks_completed} / {snapshot.tasks_total} заданий

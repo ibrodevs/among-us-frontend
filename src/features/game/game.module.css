@@ -233,3 +233,9 @@
   .hud { grid-template-columns: 1fr; }
   .headerActions svg { display: none; }
 }
+
+@media (max-width: 780px) {
+  .hud.liveHud { display: block; }
+  .liveHud > h2 { margin-bottom: 8px; }
+  .liveHud > p { margin-bottom: 10px; }
+}
