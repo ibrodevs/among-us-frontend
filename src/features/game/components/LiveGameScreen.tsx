@@ -7,12 +7,13 @@ import { useRouter } from "next/navigation";
 import { readDirection } from "../engine/input";
 import { useGameInput } from "../hooks/useGameInput";
 import { useRoomSocket } from "../hooks/useRoomSocket";
+import { AsterionScreen } from "./AsterionScreen";
 import { LiveCanvas } from "./LiveCanvas";
 import { GameControls } from "./GameHud";
 import { TaskDialog } from "./TaskDialog";
 import type { Task } from "../network/types";
 import styles from "../game.module.css";
-const taskNames = {
+const taskNames: Record<string, string> = {
   wires: "Wire Link · Двигатели",
   sequence: "Sequence · Навигация",
   upload: "Upload · Связь",
@@ -23,8 +24,21 @@ const reasonNames: Record<string, string> = {
   impostors_eliminated: "Все предатели выведены из игры",
 };
 export function LiveGameScreen({ code }: { code: string }) {
-  const net = useRoomSocket(code),
-    { snapshot, own, playerId, status, send } = net;
+  const net = useRoomSocket(code);
+  return net.snapshot?.map_version === 2 ? (
+    <AsterionScreen code={code} net={net} />
+  ) : (
+    <LegacyGameScreen code={code} net={net} />
+  );
+}
+function LegacyGameScreen({
+  code,
+  net,
+}: {
+  code: string;
+  net: ReturnType<typeof useRoomSocket>;
+}) {
+  const { snapshot, own, playerId, status, send } = net;
   const router = useRouter();
   const [taskId, setTaskId] = useState<string | null>(null),
     [clock, setClock] = useState(0),

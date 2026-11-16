@@ -1,13 +1,17 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ApiError, gameApi } from "@/lib/api";
 import { clearGuest, readGuest } from "@/lib/guest";
+import { sound } from "@/features/audio/events";
+import { ColorPicker } from "@/features/game/components/ColorPicker";
+import { RoomSettings } from "@/features/game/components/RoomSettings";
 import type { Room } from "@/lib/types";
 
 export default function LobbyPage() {
   const { code } = useParams<{ code: string }>();
   const router = useRouter();
+  const previousCount = useRef(0);
   const [room, setRoom] = useState<Room | null>(null);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
@@ -23,6 +27,16 @@ export default function LobbyPage() {
       try {
         const result = await gameApi.getRoom(guest!.token, code);
         if (!active) return;
+        if (
+          previousCount.current &&
+          previousCount.current !== result.players.length
+        )
+          sound(
+            previousCount.current < result.players.length
+              ? "room.join"
+              : "room.leave",
+          );
+        previousCount.current = result.players.length;
         setRoom(result);
         setError("");
         if (result.status !== "waiting") router.replace("/game/" + code);
@@ -96,6 +110,22 @@ export default function LobbyPage() {
       <div className="stack">
         {room ? (
           <>
+            {guest && (
+              <ColorPicker
+                code={code}
+                token={guest.token}
+                playerId={guest.player_id}
+              />
+            )}
+            {guest && (
+              <RoomSettings
+                code={code}
+                token={guest.token}
+                isHost={room.players.some(
+                  (p) => p.id === guest.player_id && p.is_host,
+                )}
+              />
+            )}
             <p>
               Игроки: {room.players.length} / {room.max_players}
             </p>

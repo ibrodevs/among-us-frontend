@@ -140,7 +140,7 @@ export function paintStation(ctx: CanvasRenderingContext2D) {
   ctx.restore();
 }
 
-function drawPlayer(ctx: CanvasRenderingContext2D, player: PlayerVisualState, time: number, local: boolean) {
+export function drawPlayer(ctx: CanvasRenderingContext2D, player: PlayerVisualState, time: number, local: boolean) {
   const { x, y } = player.position;
   ctx.save();
   ctx.translate(x, y);

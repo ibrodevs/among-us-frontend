@@ -39,7 +39,7 @@ export function useRoomSocket(code: string) {
       );
       socket.current = ws;
       ws.onopen = () =>
-        ws.send(JSON.stringify({ type: "auth", token: guest!.token }));
+        ws.send(JSON.stringify({ type: "auth", token: guest!.token, protocol_version: 2 }));
       ws.onmessage = (event) => {
         if (disposed) return;
         lastMessage = Date.now();
@@ -67,13 +67,13 @@ export function useRoomSocket(code: string) {
           }, 15000);
         } else if (
           message.type === "game.snapshot" &&
-          message.protocol_version === 1
+          [1, 2].includes(message.protocol_version)
         ) {
           serverOffset.current = Date.parse(message.server_time) - Date.now();
           setSnapshot((previous) => acceptSnapshot(previous, message));
         } else if (
           message.type === "game.self" &&
-          message.protocol_version === 1
+          [1, 2].includes(message.protocol_version)
         ) {
           setOwn((previous) =>
             !previous ||

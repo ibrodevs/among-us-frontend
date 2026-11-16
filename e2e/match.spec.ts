@@ -154,6 +154,10 @@ for (const count of [4, 10])
         path: `test-results/lobby-${count}.png`,
         fullPage: true,
       });
+      await host.page.getByText("Настройки матча",{exact:false}).click();
+      await host.page.getByLabel("Карта",{exact:true}).selectOption("1");
+      await host.page.getByRole("button",{name:"Сохранить настройки"}).click();
+      await expect(host.page.getByText("Настройки сохранены")).toBeVisible();
       await host.page.getByRole("button", { name: "Начать игру" }).click();
       for (const c of clients)
         await expect

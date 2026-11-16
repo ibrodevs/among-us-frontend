@@ -1,3 +1,4 @@
+import { AudioProvider } from "@/features/audio/AudioProvider";
 import type { Metadata } from "next";
 import "@fontsource/nunito/cyrillic-600.css";
 import "@fontsource/nunito/cyrillic-900.css";
@@ -10,11 +11,15 @@ export const metadata: Metadata = {
   description: "A multiplayer social-deduction space game",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ru">
       <body>
-        <div className="app-shell">{children}</div>
+        <AudioProvider>
+          <div className="app-shell">{children}</div>
+        </AudioProvider>
       </body>
     </html>
   );

@@ -121,12 +121,17 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+        <p style={{ textAlign: "center" }}>
+          <Link className="action secondary" href="/demo/asterion">
+            Исследовать Asterion · демо карты
+          </Link>
+        </p>
         <div className="facts">
           <div>
             <strong>4–10</strong>игроков в экипаже
           </div>
           <div>
-            <strong>3 задания</strong>на каждого исследователя
+            <strong>7 заданий</strong>на каждого исследователя
           </div>
           <div>
             <strong>1 вопрос</strong>кому ты доверяешь?
