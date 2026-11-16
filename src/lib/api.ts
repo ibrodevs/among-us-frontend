@@ -1,6 +1,8 @@
 import { API_BASE } from "@/lib/config";
 import type { ApiErrorPayload, GuestSession, Room } from "@/lib/types";
 
+export class ApiError extends Error { constructor(public status: number, message: string) { super(message); this.name = "ApiError"; } }
+
 async function api<T>(path: string, options: { method?: string; token?: string; body?: unknown } = {}): Promise<T> {
   const response = await fetch(API_BASE + path, {
     method: options.method || "GET",
@@ -13,7 +15,8 @@ async function api<T>(path: string, options: { method?: string; token?: string; 
   });
   if (!response.ok) {
     const data = (await response.json().catch(() => ({}))) as ApiErrorPayload;
-    throw new Error(typeof data.detail === "string" ? data.detail : "HTTP " + response.status);
+    const detail = typeof data.detail === "string" ? data.detail : Object.values(data).flat().filter(v => typeof v === "string").join(" · ");
+    throw new ApiError(response.status, detail || "Ошибка сервера: " + response.status);
   }
   return response.status === 204 ? (undefined as T) : (response.json() as Promise<T>);
 }

@@ -9,6 +9,7 @@ export function readGuest(): GuestSession | null {
     return value?.token && value.player_id && value.nickname ? value : null;
   } catch { return null; }
 }
+export function clearGuest() { localStorage.removeItem(KEY); }
 export async function ensureGuest(nickname: string): Promise<GuestSession> {
   const normalized = nickname.trim();
   if (normalized.length < 2 || normalized.length > 16) throw new Error("Имя должно содержать 2–16 символов");
