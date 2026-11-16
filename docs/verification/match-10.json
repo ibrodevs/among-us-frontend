@@ -1,0 +1,73 @@
+{
+  "players": 10,
+  "elapsed_ms": 103700,
+  "snapshots": [
+    686,
+    685,
+    685,
+    685,
+    685,
+    685,
+    685,
+    685,
+    685,
+    685
+  ],
+  "errors": [],
+  "result": {
+    "winner": "crew",
+    "reason": "impostors_eliminated",
+    "players_with_roles": [
+      {
+        "id": "3c22f6bd-48eb-4ec7-bfe4-3af66912a756",
+        "nickname": "QA038097",
+        "role": "crew"
+      },
+      {
+        "id": "eda57fb5-fd59-41ab-be51-34c203d00921",
+        "nickname": "QA138490",
+        "role": "crew"
+      },
+      {
+        "id": "29f3273d-e732-4f46-9e3a-d34e7897f711",
+        "nickname": "QA238783",
+        "role": "impostor"
+      },
+      {
+        "id": "88ef35f1-db6f-4bcc-8645-eb1435922a16",
+        "nickname": "QA339084",
+        "role": "crew"
+      },
+      {
+        "id": "f45f4431-8e45-4c27-b3ee-a610ba7aac05",
+        "nickname": "QA439382",
+        "role": "crew"
+      },
+      {
+        "id": "e7698e6b-6e5b-42f9-bb35-f4a5960a0794",
+        "nickname": "QA539681",
+        "role": "impostor"
+      },
+      {
+        "id": "8a4dbd5e-2160-4ba0-8720-9df567b6c994",
+        "nickname": "QA639985",
+        "role": "crew"
+      },
+      {
+        "id": "e361d3b0-9d43-4b2b-a41a-4c82374ef407",
+        "nickname": "QA740287",
+        "role": "crew"
+      },
+      {
+        "id": "f28942d0-2c75-4f19-8d8a-901d41d7e98c",
+        "nickname": "QA840593",
+        "role": "crew"
+      },
+      {
+        "id": "f2cc0e48-83da-427e-bc84-a1033b11e55f",
+        "nickname": "QA940893",
+        "role": "crew"
+      }
+    ]
+  }
+}

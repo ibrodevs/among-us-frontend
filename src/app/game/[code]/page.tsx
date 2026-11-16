@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { GameScreen } from "@/features/game/components/GameScreen";
+import { LiveGameScreen } from "@/features/game/components/LiveGameScreen";
 
 export const metadata: Metadata = {
   title: "Орбитальная станция · Crew Mission",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 
 export default async function GamePage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params;
-  return <GameScreen key={code} code={code} />;
+  return <LiveGameScreen key={code} code={code} />;
 }

@@ -1,0 +1,37 @@
+{
+  "players": 4,
+  "elapsed_ms": 39366,
+  "snapshots": [
+    313,
+    311,
+    311,
+    311
+  ],
+  "errors": [],
+  "result": {
+    "winner": "crew",
+    "reason": "impostors_eliminated",
+    "players_with_roles": [
+      {
+        "id": "b8cddc22-4311-4f25-9233-9fc1a0e8a0a9",
+        "nickname": "QA020859",
+        "role": "impostor"
+      },
+      {
+        "id": "2a828399-25e3-4dd8-a98e-b29fc246253b",
+        "nickname": "QA121191",
+        "role": "crew"
+      },
+      {
+        "id": "cb463c7f-69a6-4703-8f8b-db602cbf7fd0",
+        "nickname": "QA221485",
+        "role": "crew"
+      },
+      {
+        "id": "dbc02f51-74f5-4121-9c69-c19d960bf806",
+        "nickname": "QA321780",
+        "role": "crew"
+      }
+    ]
+  }
+}
