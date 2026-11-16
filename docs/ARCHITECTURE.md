@@ -25,3 +25,7 @@ See [API contract](API-CONTRACT.md). Kutman/Ilyar agree on interfaces *before* m
 
 ## Not in first MVP
 Public matchmaking, email/password, skins/shop, voice chat, 3D rendering, moderation infrastructure, scalable multi-region deployment, advanced anti-cheat.
+
+
+## Implemented integration extension
+See [WebSocket v1](WS-EVENTS.md) for the actual typed snapshots, private state, clock worker, shared geometry and departure rules. PostgreSQL is authoritative; Redis delivers committed events. The frontend route `/game/{code}` runs the real match; `/demo` is the isolated local physics demo. No demo crew are used in live matches. Release review and deployment verification remain separate gates.

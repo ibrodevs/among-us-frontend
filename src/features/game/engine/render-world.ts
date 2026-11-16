@@ -40,21 +40,21 @@ function equipment(ctx: CanvasRenderingContext2D, rect: Rect, color: string, kin
   ctx.save();
   ctx.translate(rect.x, rect.y);
   const { width: w, height: h } = rect;
-  box(ctx, 0, 0, w, h, "#0c1b34", 11, "#101e38");
-  box(ctx, 4, 4, w - 8, h - 13, "#304865", 8);
+  box(ctx, 0, 0, w, h, "#000437", 11, "#000437");
+  box(ctx, 4, 4, w - 8, h - 13, "#3c3c3c", 8);
   if (kind === 2) {
-    box(ctx, 12, 12, w - 24, h - 31, "#e49a65");
-    for (let x = 22; x < w - 18; x += 20) box(ctx, x, 20, 8, h - 47, "#ffe4a3", 4);
-    box(ctx, 43, 11, w - 86, h - 28, "#a76455", 6, "#17293e");
-    box(ctx, 55, 22, w - 110, h - 50, "#ffb777", 5);
+    box(ctx, 12, 12, w - 24, h - 31, "#a5ed6e");
+    for (let x = 22; x < w - 18; x += 20) box(ctx, x, 20, 8, h - 47, "#d7ffb8", 4);
+    box(ctx, 43, 11, w - 86, h - 28, "#777777", 6, "#042c60");
+    box(ctx, 55, 22, w - 110, h - 50, "#d7ffb8", 5);
   } else if (kind === 3) {
-    box(ctx, 12, 12, w - 24, h - 31, "#c0f1e9", 10);
-    box(ctx, 23, 20, 25, h - 47, "#60b6c4", 6);
-    box(ctx, 54, 20, w - 77, h - 47, "#effcfa", 6);
-    line(ctx, [w - 42, h / 2 - 10, w - 42, h / 2 + 2], "#379898", 4);
-    line(ctx, [w - 48, h / 2 - 4, w - 36, h / 2 - 4], "#379898", 4);
+    box(ctx, 12, 12, w - 24, h - 31, "#d7ffb8", 10);
+    box(ctx, 23, 20, 25, h - 47, "#1cb0f6", 6);
+    box(ctx, 54, 20, w - 77, h - 47, "#ffffff", 6);
+    line(ctx, [w - 42, h / 2 - 10, w - 42, h / 2 + 2], "#777777", 4);
+    line(ctx, [w - 48, h / 2 - 4, w - 36, h / 2 - 4], "#777777", 4);
   } else {
-    box(ctx, 11, 11, w - 22, h - 35, "#142741", 5, "#172339");
+    box(ctx, 11, 11, w - 22, h - 35, "#042c60", 5, "#000437");
     if (kind === 1) {
       const cy = Math.round((h - 14) / 2);
       line(ctx, [20, cy, 34, cy, 43, cy - 10, 52, cy + 8, 62, cy - 6, 72, cy, w - 22, cy], color, 3);
@@ -63,32 +63,32 @@ function equipment(ctx: CanvasRenderingContext2D, rect: Rect, color: string, kin
         const height = Math.min(h - 46, 9 + x % 26);
         box(ctx, x, h - 30 - height, 10, height, color, 3);
       }
-      line(ctx, [16, h - 28, w - 16, h - 28], "#587c9a", 2);
+      line(ctx, [16, h - 28, w - 16, h - 28], "#777777", 2);
     }
     for (let x = 20; x < 50; x += 12) disc(ctx, x, h - 16, 3, color);
-    box(ctx, w - 41, h - 19, 26, 6, "#8098b1", 3);
+    box(ctx, w - 41, h - 19, 26, 6, "#777777", 3);
   }
   ctx.restore();
 }
 
 export function paintStation(ctx: CanvasRenderingContext2D) {
   const { width, height, zones, corridors, walls, taskPoints } = mapConfig;
-  ctx.fillStyle = "#111d36";
+  ctx.fillStyle = "#000437";
   ctx.fillRect(0, 0, width, height);
   for (let i = 0; i < 175; i++) {
     const x = (i * 317 + i * i * 53) % width;
     const y = (i * 191 + i * i * 17) % height;
-    disc(ctx, x, y, i % 13 === 0 ? 3 : 1.5, i % 13 === 0 ? "#8faac3" : "#3d5474");
+    disc(ctx, x, y, i % 13 === 0 ? 3 : 1.5, i % 13 === 0 ? "#777777" : "#3c3c3c");
   }
 
   const roomsAndPassages = [...zones.map(zone => zone.bounds), ...corridors];
   ctx.save();
   ctx.beginPath();
   for (const rect of roomsAndPassages) ctx.rect(rect.x, rect.y, rect.width, rect.height);
-  ctx.strokeStyle = "#0a1327";
+  ctx.strokeStyle = "#000437";
   ctx.lineWidth = 32;
   ctx.stroke();
-  ctx.strokeStyle = "#46617c";
+  ctx.strokeStyle = "#777777";
   ctx.lineWidth = 12;
   ctx.stroke();
   ctx.clip();
@@ -99,10 +99,10 @@ export function paintStation(ctx: CanvasRenderingContext2D) {
     ctx.fillRect(x, y, width, height);
     box(ctx, x + 13, y + 13, width - 26, height - 26, zone.floor, 10, "#ffffff20");
     for (let offset = 30; offset < width - 18; offset += 42) {
-      line(ctx, [x + offset, y + 52, x + offset, y + height - 15], "#101b3633", 2);
+      line(ctx, [x + offset, y + 52, x + offset, y + height - 15], "#00043733", 2);
     }
     for (let offset = 64; offset < height - 15; offset += 42) {
-      line(ctx, [x + 15, y + offset, x + width - 15, y + offset], "#101b3633", 2);
+      line(ctx, [x + 15, y + offset, x + width - 15, y + offset], "#00043733", 2);
     }
     box(ctx, x + 25, y + 24, 10, 25, zone.color, 3);
     ctx.font = "800 26px system-ui, sans-serif";
@@ -113,16 +113,16 @@ export function paintStation(ctx: CanvasRenderingContext2D) {
   }
 
   for (const [i, rect] of corridors.entries()) {
-    ctx.fillStyle = "#314664";
+    ctx.fillStyle = "#3c3c3c";
     ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
     if (i === 2) {
       for (let x = rect.x + 30; x < rect.x + rect.width; x += 35) {
-        box(ctx, x, 446, 16, 6, "#637e98", 3);
+        box(ctx, x, 446, 16, 6, "#777777", 3);
       }
     } else {
       for (let y = rect.y + 5; y < rect.y + rect.height - 5; y += 21) {
-        box(ctx, rect.x + 9, y, 9, 10, "#a2c4d3", 3);
-        box(ctx, rect.x + rect.width - 18, y, 9, 10, "#a2c4d3", 3);
+        box(ctx, rect.x + 9, y, 9, 10, "#d7ffb8", 3);
+        box(ctx, rect.x + rect.width - 18, y, 9, 10, "#d7ffb8", 3);
       }
     }
   }
@@ -133,9 +133,9 @@ export function paintStation(ctx: CanvasRenderingContext2D) {
     equipment(ctx, rect, zones[kind].color, kind);
   });
   taskPoints.forEach(({ position: { x, y } }, index) => {
-    disc(ctx, x, y, 11, "#10253b");
+    disc(ctx, x, y, 11, "#000437");
     disc(ctx, x, y, 7, zones[index].color);
-    disc(ctx, x, y, 3, "#10253b");
+    disc(ctx, x, y, 3, "#000437");
   });
   ctx.restore();
 }
@@ -147,7 +147,7 @@ function drawPlayer(ctx: CanvasRenderingContext2D, player: PlayerVisualState, ti
   if (local) {
     ctx.beginPath();
     ctx.ellipse(0, 10, 25, 13, 0, 0, 2 * Math.PI);
-    ctx.fillStyle = "#16333d";
+    ctx.fillStyle = "#3c3c3c";
     ctx.fill();
     ctx.lineWidth = 3;
     ctx.strokeStyle = "#a5ed6e";
@@ -156,22 +156,22 @@ function drawPlayer(ctx: CanvasRenderingContext2D, player: PlayerVisualState, ti
   ctx.save();
   ctx.scale(player.facing, 1);
   const step = player.moving ? Math.sin(time / 70) * 3 : 0;
-  const outline = "#09172d";
+  const outline = "#000437";
   box(ctx, -12, 3 + step, 9, 13, player.color, 4, outline);
   box(ctx, 4, 3 - step, 9, 13, player.color, 4, outline);
-  box(ctx, -21, -19, 11, 20, "#94a5bc", 5, outline);
+  box(ctx, -21, -19, 11, 20, "#777777", 5, outline);
   box(ctx, -15, -26, 32, 35, player.color, 12, outline);
   line(ctx, [-7, -24, -10, -33], outline, 4);
   disc(ctx, -10, -34, 5, player.color);
-  box(ctx, -6, -20, 24, 14, "#192f4c", 5, outline);
-  box(ctx, 0, -17, 10, 4, "#a9edff", 2);
+  box(ctx, -6, -20, 24, 14, "#042c60", 5, outline);
+  box(ctx, 0, -17, 10, 4, "#d7ffb8", 2);
   ctx.restore();
   ctx.font = "800 16px system-ui, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   const width = Math.ceil(ctx.measureText(player.label).width) + 24;
-  box(ctx, -width / 2, -66, width, 25, local ? "#d7ffb8" : "#172945", 8);
-  ctx.fillStyle = local ? "#16351e" : "#f1f6ff";
+  box(ctx, -width / 2, -66, width, 25, local ? "#d7ffb8" : "#042c60", 8);
+  ctx.fillStyle = local ? "#3c3c3c" : "#ffffff";
   ctx.fillText(player.label, 0, -53);
   ctx.restore();
 }
@@ -196,11 +196,11 @@ export function renderWorld(
 export function renderRadar(ctx: CanvasRenderingContext2D, player: PlayerVisualState, camera: ReturnType<typeof calculateCamera>, viewport: { width: number; height: number }) {
   const { width, height, zones, corridors } = mapConfig;
   ctx.clearRect(0, 0, width, height);
-  for (const corridor of corridors) block(ctx, corridor, "#4c6580", 0);
+  for (const corridor of corridors) block(ctx, corridor, "#777777", 0);
   for (const zone of zones) block(ctx, zone.bounds, zone.color, 26);
   ctx.strokeStyle = "#ffffffbb";
   ctx.lineWidth = 12;
   ctx.strokeRect(camera.x + 6, camera.y + 6, viewport.width / camera.scale - 12, viewport.height / camera.scale - 12);
-  disc(ctx, player.position.x, player.position.y, 58, "#142746");
+  disc(ctx, player.position.x, player.position.y, 58, "#042c60");
   disc(ctx, player.position.x, player.position.y, 39, "#a5ed6e");
 }

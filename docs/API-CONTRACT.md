@@ -39,3 +39,7 @@ Clients never generate authoritative kill, vote, task-completion or game-winner 
 
 ## Rules
 Phase progression: `waiting → playing → meeting → playing` (repeat) `→ finished`. Default: 4–6 players = 1 impostor; 7–10 = 2 impostors. 3 tasks/crew. Host starts; server chooses roles using secure randomness; all gameplay checks run on server. No premature win when starting. Document tie, parity, leaving and reconnect behavior with tests.
+
+
+## Implemented extensions
+The versioned [WS-EVENTS](WS-EVENTS.md) defines task.begin, challenge/time validation, private game.self and concrete snapshots. Explicit in-game leave now returns204, retires the player and re-evaluates the winner. Historical roles are retained and disclosed only after finish. All original REST paths and Room fields are unchanged.
