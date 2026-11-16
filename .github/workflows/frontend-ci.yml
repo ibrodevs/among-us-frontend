@@ -29,7 +29,7 @@ jobs:
           POSTGRES_PASSWORD: crew_ci_only
           POSTGRES_DB: crew_e2e
         ports: ["5432:5432"]
-        options: --health-cmd 'pg_isready -U crew' --health-interval 5s --health-timeout 3s --health-retries 15
+        options: --health-cmd "pg_isready -U crew" --health-interval 5s --health-timeout 3s --health-retries 15
       redis:
         image: redis:8
         ports: ["6379:6379"]
