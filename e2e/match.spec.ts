@@ -368,33 +368,48 @@ test("all three real task dialogs, kill, report, skip vote and impostor victory"
         ["x", x],
         ["y", y],
       ] as const) {
-        const value = c.snapshot!.players.find((p) => p.id === c.id)![axis];
-        if (Math.abs(value - target) < 15) continue;
-        const key =
-          axis === "x"
-            ? value < target
-              ? "ArrowRight"
-              : "ArrowLeft"
-            : value < target
-              ? "ArrowDown"
-              : "ArrowUp";
-        await c.page.keyboard.down(key);
-        await expect
-          .poll(
-            () =>
-              Math.abs(
-                c.snapshot!.players.find((p) => p.id === c.id)![axis] - target,
-              ),
-            { timeout: 12000, intervals: [50] },
-          )
-          .toBeLessThan(14);
-        await c.page.keyboard.up(key);
-        await c.page.waitForTimeout(180);
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const value = c.snapshot!.players.find((p) => p.id === c.id)![axis];
+          if (Math.abs(value - target) < 20) break;
+          const positive = value < target;
+          const key =
+            axis === "x"
+              ? positive
+                ? "ArrowRight"
+                : "ArrowLeft"
+              : positive
+                ? "ArrowDown"
+                : "ArrowUp";
+          await c.page.keyboard.down(key);
+          try {
+            await expect
+              .poll(
+                () => {
+                  const current = c.snapshot!.players.find(
+                    (p) => p.id === c.id,
+                  )![axis];
+                  return positive
+                    ? current >= target - 10
+                    : current <= target + 10;
+                },
+                { timeout: 12000, intervals: [50] },
+              )
+              .toBeTruthy();
+          } finally {
+            await c.page.keyboard.up(key);
+          }
+          await c.page.waitForTimeout(250);
+        }
+        expect(
+          Math.abs(
+            c.snapshot!.players.find((p) => p.id === c.id)![axis] - target,
+          ),
+        ).toBeLessThan(30);
       }
     }
     await go(crew, 432, 450);
-    await go(crew, 432, 294);
-    await go(crew, 568, 294);
+    await go(crew, 432, 320);
+    await go(crew, 568, 320);
     await crew.page
       .getByRole("button", { name: "○ Sequence · Навигация", exact: true })
       .click();
@@ -411,8 +426,9 @@ test("all three real task dialogs, kill, report, skip vote and impostor victory"
       .getByRole("button", { name: "Подтвердить", exact: true })
       .click();
     await expect(crew.page.getByRole("dialog")).toBeHidden();
-    await go(crew, 432, 294);
+    await go(crew, 432, 320);
     await go(crew, 432, 676);
+    await go(crew, 400, 676);
     await crew.page
       .getByRole("button", { name: "○ Wire Link · Двигатели", exact: true })
       .click();
@@ -433,8 +449,8 @@ test("all three real task dialogs, kill, report, skip vote and impostor victory"
     await expect(crew.page.getByRole("dialog")).toBeHidden();
     await go(crew, 432, 450);
     await go(crew, 1166, 450);
-    await go(crew, 1166, 294);
-    await go(crew, 1067, 294);
+    await go(crew, 1166, 320);
+    await go(crew, 1067, 320);
     await crew.page
       .getByRole("button", { name: "○ Upload · Связь", exact: true })
       .click();

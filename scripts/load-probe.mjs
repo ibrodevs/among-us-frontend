@@ -99,6 +99,10 @@ try {
   let n = 0;
   timer = setInterval(() => {
     n++;
+    if (n % 150 === 0)
+      for (const c of clients)
+        if (c.socket.readyState === WebSocket.OPEN)
+          c.socket.send(JSON.stringify({ type: "ping" }));
     for (const c of clients)
       if (c.socket.readyState === WebSocket.OPEN)
         c.socket.send(
@@ -132,7 +136,10 @@ try {
   const report = {
     clients: 10,
     traffic_ms: Date.now() - trafficStart,
-    commands_per_second: 100,
+    configured_commands_per_second: 100,
+    commands_sent: n * 10,
+    measured_commands_per_second:
+      (n * 10) / ((Date.now() - trafficStart) / 1000),
     snapshots: clients.map((c) => c.snapshots),
     local_move_events: clients.map((c) => c.moves),
     latency_p50_ms: latencies[Math.floor(latencies.length * 0.5)],
