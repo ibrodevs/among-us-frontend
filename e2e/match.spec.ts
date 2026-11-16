@@ -519,7 +519,16 @@ test("room form validation, real 404 and expired guest recovery", async ({
   await page.getByLabel("Как тебя зовут, капитан?").fill(nickname);
   await page.getByLabel("Уже есть приглашение?").fill("ZZZZZZ");
   await page.getByRole("button", { name: "Войти в экипаж" }).click();
-  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(page.locator("p.error[role=alert]")).toContainText(
+    /Room|Not found|найден/i,
+  );
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        Boolean(localStorage.getItem("crew-mission-guest-v1")),
+      ),
+    )
+    .toBeTruthy();
   await page.evaluate(() => {
     const key = "crew-mission-guest-v1";
     const guest = JSON.parse(localStorage.getItem(key)!);
