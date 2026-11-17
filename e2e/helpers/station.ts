@@ -18,119 +18,125 @@ export async function walk(c: Client, target: { x: number; y: number }) {
       ...station.walls,
       ...(c.snapshot?.doors || []).filter((d) => d.closed).map((d) => d.bounds),
     ],
-    free = (x: number, y: number) =>
+    clear = (x: number, y: number, half = 20) =>
       !walls.some(
         (r) =>
-          x - 24 < r.x + r.width &&
-          x + 24 > r.x &&
-          y - 24 < r.y + r.height &&
-          y + 24 > r.y,
-      );
-  const key = (x: number, y: number) => y * w + x,
-    startX = Math.floor(c.own!.x! / size),
-    startY = Math.floor(c.own!.y! / size),
-    start = key(startX, startY),
-    queue = [start],
-    parents = new Map<number, number>([[start, -1]]);
-  let goal = -1;
-  for (let i = 0; i < queue.length; i++) {
-    const n = queue[i],
-      x = n % w,
-      y = Math.floor(n / w);
-    if (Math.hypot(x * size + 10 - target.x, y * size + 10 - target.y) < 55) {
-      goal = n;
-      break;
-    }
-    for (const [dx, dy] of [
-      [1, 0],
-      [-1, 0],
-      [0, 1],
-      [0, -1],
-    ]) {
-      const nx = x + dx,
-        ny = y + dy,
-        k = key(nx, ny);
+          x - half < r.x + r.width &&
+          x + half > r.x &&
+          y - half < r.y + r.height &&
+          y + half > r.y,
+      ),
+    ds = new Int32Array(w * h),
+    queue = new Int32Array(w * h);
+  ds.fill(-1);
+  let head = 0,
+    tail = 0;
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++)
       if (
-        nx < 0 ||
-        ny < 0 ||
-        nx >= w ||
-        ny >= h ||
-        parents.has(k) ||
-        !free(nx * size + 10, ny * size + 10)
-      )
-        continue;
-      parents.set(k, n);
-      queue.push(k);
-    }
+        Math.hypot(x * size + 10 - target.x, y * size + 10 - target.y) < 55 &&
+        clear(x * size + 10, y * size + 10)
+      ) {
+        ds[y * w + x] = 0;
+        queue[tail++] = y * w + x;
+      }
+  while (head < tail) {
+    const n = queue[head++];
+    for (const q of [n - 1, n + 1, n - w, n + w])
+      if (
+        q >= 0 &&
+        q < w * h &&
+        ds[q] < 0 &&
+        clear((q % w) * size + 10, Math.floor(q / w) * size + 10)
+      ) {
+        ds[q] = ds[n] + 1;
+        queue[tail++] = q;
+      }
   }
-  if (goal < 0) throw new Error("No reachable UI walking path");
-  const path: number[] = [];
-  for (let n = goal; n !== -1; n = parents.get(n)!) path.push(n);
-  path.reverse();
-  const points = path
-    .filter(
-      (n, i) =>
-        i === path.length - 1 || (i > 0 && n - path[i - 1] !== path[i + 1] - n),
-    )
-    .map((n) => ({ x: (n % w) * size + 10, y: Math.floor(n / w) * size + 10 }));
-  for (const p of points) {
-    for (let attempt = 0; attempt < 35; attempt++) {
-      const position = { x: c.own!.x!, y: c.own!.y! };
-      const axes = (["x", "y"] as const).filter(
-        (axis) => Math.abs(p[axis] - position[axis]) >= 8,
+  const began = Date.now();
+  while (Math.hypot(c.own!.x! - target.x, c.own!.y! - target.y) >= 75) {
+    if (Date.now() - began > 120000)
+      throw new Error(
+        `Walking timeout ${c.snapshot?.phase}: ${c.own!.x},${c.own!.y} toward ${target.x},${target.y}`,
       );
-      if (!axes.length) break;
-      const canTravel = (axis: "x" | "y") => {
-        const delta = p[axis] - position[axis];
-        for (let n = 0; n <= Math.abs(delta); n += 6) {
-          const q = {
-            ...position,
-            [axis]: position[axis] + Math.sign(delta) * n,
-          };
-          if (
-            walls.some(
-              (r) =>
-                q.x - 14 < r.x + r.width &&
-                q.x + 14 > r.x &&
-                q.y - 14 < r.y + r.height &&
-                q.y + 14 > r.y,
-            )
+    const pos = { x: c.own!.x!, y: c.own!.y! };
+    const safe = (axis: "x" | "y", delta: number) => {
+      for (let i = 0; i <= Math.abs(delta); i += 3)
+        if (
+          !clear(
+            pos.x + (axis === "x" ? Math.sign(delta) * i : 0),
+            pos.y + (axis === "y" ? Math.sign(delta) * i : 0),
+            14,
           )
-            return false;
+        )
+          return false;
+      return true;
+    };
+    let n = Math.floor(pos.y / size) * w + Math.floor(pos.x / size),
+      recovery = false;
+    if (ds[n] < 0) {
+      let distance = Infinity;
+      const cx = Math.floor(pos.x / size),
+        cy = Math.floor(pos.y / size);
+      for (let y = cy - 4; y <= cy + 4; y++)
+        for (let x = cx - 4; x <= cx + 4; x++) {
+          const q = y * w + x,
+            dx = x * size + 10 - pos.x,
+            dy = y * size + 10 - pos.y,
+            d = Math.hypot(dx, dy);
+          if (
+            ds[q] >= 0 &&
+            d < distance &&
+            ((Math.abs(dx) < 3 && safe("y", dy)) ||
+              (Math.abs(dy) < 3 && safe("x", dx)) ||
+              (safe("x", dx) && safe("y", dy)))
+          ) {
+            n = q;
+            distance = d;
+            recovery = true;
+          }
         }
-        return true;
-      };
-      const axis = axes.find(canTravel);
-      if (!axis)
-        throw new Error(
-          `No safe corner alignment at ${position.x},${position.y} to ${p.x},${p.y}`,
-        );
-      const delta = p[axis] - position[axis],
-        key =
-          axis === "x"
-            ? delta > 0
-              ? "ArrowRight"
-              : "ArrowLeft"
-            : delta > 0
-              ? "ArrowDown"
-              : "ArrowUp";
-      const ackBefore = c.own!.last_move_seq;
-      await c.page.keyboard.down(key);
-      await sleep(
-        Math.max(40, Math.min(900, ((Math.abs(delta) - 3) / 220) * 1000)),
-      );
-      await c.page.keyboard.up(key);
-      await expect
-        .poll(() => c.own!.last_move_seq, { timeout: 15000 })
-        .toBeGreaterThan(ackBefore);
-      await sleep(150);
-      if (attempt === 34)
-        throw new Error(
-          `Walking did not settle at ${c.own!.x},${c.own!.y} toward ${p.x},${p.y}`,
-        );
+      if (!recovery) throw new Error("No reachable movement recovery cell");
     }
+    let best = n,
+      delta = 0;
+    for (let i = 0; !recovery && i < 4; i++) {
+      const q = [best - 1, best + 1, best - w, best + w].find(
+        (q) => ds[q] >= 0 && ds[q] < ds[best],
+      );
+      if (q === undefined || (i && q - best !== delta)) break;
+      delta = q - best;
+      best = q;
+    }
+    const dx = (best % w) * size + 10 - pos.x,
+      dy = Math.floor(best / w) * size + 10 - pos.y;
+    const axes: ["x" | "y", number][] =
+      Math.abs(dx) > Math.abs(dy)
+        ? [
+            ["x", dx],
+            ["y", dy],
+          ]
+        : [
+            ["y", dy],
+            ["x", dx],
+          ];
+    const axis = axes.find(([key, d]) => Math.abs(d) > 3 && safe(key, d));
+    if (!axis) throw new Error(`No safe movement at ${pos.x},${pos.y}`);
+    const key =
+        axis[0] === "x"
+          ? axis[1] > 0
+            ? "ArrowRight"
+            : "ArrowLeft"
+          : axis[1] > 0
+            ? "ArrowDown"
+            : "ArrowUp",
+      seq = c.own!.last_move_seq;
+    await c.page.keyboard.down(key);
+    await sleep(
+      Math.max(40, Math.min(350, ((Math.abs(axis[1]) - 3) / 220) * 1000)),
+    );
+    await c.page.keyboard.up(key);
+    await expect.poll(() => c.own!.last_move_seq).toBeGreaterThan(seq);
+    await sleep(120);
   }
-  expect(Math.hypot(c.own!.x! - target.x, c.own!.y! - target.y)).toBeLessThan(
-    85,
-  );
 }

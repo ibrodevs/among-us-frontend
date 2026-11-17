@@ -15,3 +15,5 @@ Run the sibling backend with real PostgreSQL, Redis, Daphne and `run_game_worker
 Reports contain aggregate timing, rule rejections and resource samples. No auth tokens, payload dumps or guest identities are committed. Expected rule rejections from concurrent actions are distinct from unexpected errors.
 
 Local measurements do not certify Northflank performance; repeat the probe against the actual deployed stack. Use `CREW_API_URL=https://your-api` for the soak. Browser tests require their documented local origins/ports.
+
+For a deployed check set `CREW_API_URL=https://<backend>` and `CREW_FRONTEND_URL=https://<frontend>`; the latter must match an allowed backend origin. Local process/clock metrics apply only on the machine running those services.

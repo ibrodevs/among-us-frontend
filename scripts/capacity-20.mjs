@@ -4,7 +4,8 @@ import WebSocket from "ws";
 import { chromium, expect } from "@playwright/test";
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { setTimeout as sleep } from "node:timers/promises";
-const api = process.env.CREW_API_URL || "http://127.0.0.1:8000";
+const api = process.env.CREW_API_URL || "http://127.0.0.1:8000",
+  frontend = process.env.CREW_FRONTEND_URL || "http://localhost:3000";
 const map = JSON.parse(
   readFileSync("src/features/game/engine/asterion.json", "utf8"),
 );
@@ -53,7 +54,7 @@ function send(c, data) {
 async function connect(c) {
   const ws = new WebSocket(
     api.replace(/^http/, "ws") + "/ws/rooms/" + code + "/",
-    { origin: "http://localhost:3000" },
+    { origin: frontend },
   );
   c.ws = ws;
   c.auth = false;
@@ -161,7 +162,7 @@ try {
   page.on("pageerror", (e) =>
     errors.push({ code: "BROWSER", detail: e.message }),
   );
-  await page.goto("http://localhost:3000/room/" + code);
+  await page.goto(frontend + "/room/" + code);
   await expect(
     page.getByText("Игроки: 20 / 20", { exact: true }),
   ).toBeVisible();

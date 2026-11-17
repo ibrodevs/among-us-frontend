@@ -110,7 +110,7 @@ async function connect(c) {
   c.auth = false;
   const ws = new WebSocket(
     api.replace(/^http/, "ws") + "/ws/rooms/" + room + "/",
-    { origin: "http://localhost:3000" },
+    { origin: process.env.CREW_FRONTEND_URL || "http://localhost:3000" },
   );
   c.ws = ws;
   ws.on("open", () =>
@@ -163,11 +163,11 @@ async function connect(c) {
     }
     if (m.type === "game.self") {
       if (c.own) {
-        counts.tasks += m.tasks.filter(
-          (t) =>
-            t.is_completed &&
-            !c.own.tasks.find((q) => q.id === t.id)?.is_completed,
-        ).length;
+        for (const task of m.tasks)
+          if (task.is_completed && !c.completed.has(task.id)) {
+            c.completed.add(task.id);
+            counts.tasks++;
+          }
         if (m.is_in_vent && !c.own.is_in_vent) counts.vents++;
         if (!m.alive && c.own.alive) counts.kills++;
       }
@@ -399,51 +399,28 @@ function bot(c, elapsed) {
       return;
     }
   }
-  if (
-    process.env.CREW_SOAK_DEBUG &&
-    c.index === 0 &&
-    clock() - (c.debugAt || 0) > 5000
-  ) {
-    c.debugAt = clock();
-    console.log(
-      "DEBUG",
-      JSON.stringify({
-        phase: s.phase,
-        ownPhase: o.phase,
-        sabos: s.sabotages.map((x) => [x.kind, x.id]),
-        repairers: [...repairers],
-        repairs: counts.repairs,
-        version: s.state_version,
-        ownVersion: o.state_version,
-      }),
-    );
-  }
   const light = s.sabotages.find(
     (q) => q.kind === "lights" || q.kind === "comms",
   );
   const crews = clients.filter((q) => q.own?.role === "crew" && q.own.alive);
+  if (light && !crews.some((q) => q.index === repairers.get(light.id)))
+    repairers.set(
+      light.id,
+      crews
+        .slice()
+        .sort(
+          (a, b) => near(a.own, light.panels[0]) - near(b.own, light.panels[0]),
+        )[0]?.index,
+    );
   if (
     light &&
     o.role === "crew" &&
     o.alive &&
-    crews
-      .slice()
-      .sort(
-        (a, b) => near(a.own, light.panels[0]) - near(b.own, light.panels[0]),
-      )[0] === c
+    repairers.get(light.id) === c.index
   ) {
     const panel = light.panels[0];
     if (walk(c, panel, 70)) {
       const attempt = o.repair;
-      if (process.env.CREW_SOAK_DEBUG)
-        console.log(
-          "REPAIR",
-          c.index,
-          light.kind,
-          attempt,
-          c.repairAt,
-          clock(),
-        );
       if (!attempt || attempt.sabotage_id !== light.id) {
         send(c, {
           type: "sabotage.repair.begin",
@@ -518,6 +495,7 @@ async function startRound() {
   round++;
   roundEpoch = clock();
   saboIndex = 0;
+  repairers.clear();
   lastSabotage = 0;
   lastMeeting = clock();
   room = (
@@ -546,7 +524,15 @@ async function startRound() {
   for (const [index, g] of guests.entries()) {
     let c = clients[index];
     if (!c) {
-      c = { g, index, seq: 0, pending: new Map(), snapshots: 0, bytes: 0 };
+      c = {
+        g,
+        index,
+        seq: 0,
+        pending: new Map(),
+        completed: new Set(),
+        snapshots: 0,
+        bytes: 0,
+      };
       clients.push(c);
     }
     Object.assign(c, {

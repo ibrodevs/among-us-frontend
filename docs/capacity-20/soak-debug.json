@@ -1,0 +1,938 @@
+{
+  "requestedSeconds": 180,
+  "durationSeconds": 180.9771155,
+  "playersPerMatch": 20,
+  "selectedImpostors": 3,
+  "rounds": 2,
+  "counts": {
+    "tasks": 43,
+    "vents": 3,
+    "ventTravel": 3,
+    "sabotages": 4,
+    "repairs": 1,
+    "kills": 3,
+    "reports": 1,
+    "meetings": 2,
+    "votes": 37,
+    "finishes": 1,
+    "reconnects": 2
+  },
+  "rtt": {
+    "samples": 1082,
+    "mean": 585.2873571645105,
+    "p95": 2499.034833999991,
+    "p99": 2940.232834000024
+  },
+  "ack": {
+    "samples": 4190,
+    "p95": 9017.31633300001,
+    "p99": 15029.508417000005
+  },
+  "errors": [],
+  "rejections": {
+    "OUT_OF_RANGE": 3,
+    "INVALID_PHASE": 479,
+    "RATE_LIMITED": 2
+  },
+  "bytes": 108885056,
+  "samples": [
+    {
+      "elapsedSeconds": 1,
+      "processes": [
+        "73147  12.6  44416 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  45.6  84112 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891316.6379461,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 2640,
+            "mean": 48.83409090909091,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 2640,
+            "mean": 40.589910280769715,
+            "p95": 89.34545800002525,
+            "p99": 135.29629100230522
+          },
+          "tick_ms": {
+            "n": 2933,
+            "mean": 29.98982513402323,
+            "p95": 59.53924999630544,
+            "p99": 95.04891699907603
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 2640,
+        "hz": 9.582933576431216,
+        "activeRooms": 0
+      },
+      "server": {
+        "at": 1794891317.00718,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 100,
+            "mean": 7378.79,
+            "p95": 8348,
+            "p99": 8445
+          },
+          "command_processing_ms": {
+            "n": 295,
+            "mean": 8.23029125066399,
+            "p95": 18.75941699836403,
+            "p99": 37.336458000936545
+          },
+          "command_roundtrip_ms": {
+            "n": 295,
+            "mean": 8.515986271170007,
+            "p95": 19.302125001559034,
+            "p99": 37.597959002596326
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 100,
+          "commands": 295
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 15,
+      "processes": [
+        "73147  18.7  48912 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  75.5 104416 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891332.14628,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 2790,
+            "mean": 49.429749103942655,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 2790,
+            "mean": 40.595702965303424,
+            "p95": 88.81708300032187,
+            "p99": 134.96666700666538
+          },
+          "tick_ms": {
+            "n": 3081,
+            "mean": 30.255415189268184,
+            "p95": 59.477583003172185,
+            "p99": 95.05499999795575
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 2790,
+        "hz": 9.587664840314519,
+        "activeRooms": 1
+      },
+      "server": {
+        "at": 1794891332.22994,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 1924,
+            "mean": 9567.122661122661,
+            "p95": 10910,
+            "p99": 11535
+          },
+          "command_processing_ms": {
+            "n": 1584,
+            "mean": 6.051658285851965,
+            "p95": 21.538375003729016,
+            "p99": 40.0805829995079
+          },
+          "command_roundtrip_ms": {
+            "n": 1582,
+            "mean": 37.70213713846916,
+            "p95": 84.47591699950863,
+            "p99": 137.89479099796154
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 1924,
+          "commands": 1582
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 30,
+      "processes": [
+        "73147  14.4  48144 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  63.2 105392 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891346.62482,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 2930,
+            "mean": 49.20341296928328,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 2930,
+            "mean": 40.27215856663925,
+            "p95": 88.39420800359221,
+            "p99": 133.64549999823794
+          },
+          "tick_ms": {
+            "n": 3221,
+            "mean": 30.1631106259499,
+            "p95": 59.04766699677566,
+            "p99": 95.05499999795575
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 2930,
+        "hz": 9.591524990040623,
+        "activeRooms": 1
+      },
+      "server": {
+        "at": 1794891346.321045,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 4477,
+            "mean": 9542.100513736877,
+            "p95": 10691,
+            "p99": 11341
+          },
+          "command_processing_ms": {
+            "n": 2428,
+            "mean": 6.05355888045864,
+            "p95": 23.05070899456041,
+            "p99": 39.60166699835099
+          },
+          "command_roundtrip_ms": {
+            "n": 2426,
+            "mean": 36.796506006239674,
+            "p95": 82.02633300243178,
+            "p99": 120.42783299693838
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 4477,
+          "commands": 2426
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 45,
+      "processes": [
+        "73147  23.8  49264 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  65.3 105280 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891362.0859678,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 3080,
+            "mean": 49.3211038961039,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 3080,
+            "mean": 39.97808696598228,
+            "p95": 87.16804200230399,
+            "p99": 133.2942910012207
+          },
+          "tick_ms": {
+            "n": 3371,
+            "mean": 30.096551530157328,
+            "p95": 58.57600000308594,
+            "p99": 95.04891699907603
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 3080,
+        "hz": 9.5968150289496,
+        "activeRooms": 1
+      },
+      "server": {
+        "at": 1794891361.37123,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 6000,
+            "mean": 9439.371666666666,
+            "p95": 10549,
+            "p99": 10591
+          },
+          "command_processing_ms": {
+            "n": 3451,
+            "mean": 5.943853464117402,
+            "p95": 24.94641699740896,
+            "p99": 38.514041996677406
+          },
+          "command_roundtrip_ms": {
+            "n": 3449,
+            "mean": 37.39724467584836,
+            "p95": 81.59320800041314,
+            "p99": 114.89987500681309
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 7352,
+          "commands": 3449
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 60,
+      "processes": [
+        "73147  17.8  47216 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  31.2  96240 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891376.529122,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 3219,
+            "mean": 49.17645231438335,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 3219,
+            "mean": 39.94042626631406,
+            "p95": 86.53337499708869,
+            "p99": 132.24183300189907
+          },
+          "tick_ms": {
+            "n": 3595,
+            "mean": 29.409883042593194,
+            "p95": 57.77970900089713,
+            "p99": 92.97666599741206
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 3219,
+        "hz": 9.597969786365606,
+        "activeRooms": 2
+      },
+      "server": {
+        "at": 1794891376.7299461,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 6000,
+            "mean": 9383.281166666668,
+            "p95": 10237,
+            "p99": 12903
+          },
+          "command_processing_ms": {
+            "n": 4338,
+            "mean": 6.107664442746335,
+            "p95": 25.25416600110475,
+            "p99": 39.115791994845495
+          },
+          "command_roundtrip_ms": {
+            "n": 4284,
+            "mean": 38.929280969420326,
+            "p95": 86.44491699669743,
+            "p99": 136.83966600365238
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 8891,
+          "commands": 4284
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 75,
+      "processes": [
+        "73147  17.8  48736 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  47.2  90208 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891392.0654101,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 3369,
+            "mean": 48.29533986346097,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 3369,
+            "mean": 39.54479521111672,
+            "p95": 85.73795900156256,
+            "p99": 130.45929099462228
+          },
+          "tick_ms": {
+            "n": 3895,
+            "mean": 27.958056140997847,
+            "p95": 56.67087500478374,
+            "p99": 91.89045799575979
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 3369,
+        "hz": 9.600465205079828,
+        "activeRooms": 2
+      },
+      "server": {
+        "at": 1794891392.151906,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 6000,
+            "mean": 9347.2455,
+            "p95": 10793,
+            "p99": 13277
+          },
+          "command_processing_ms": {
+            "n": 4643,
+            "mean": 6.157993925400751,
+            "p95": 24.801625004329253,
+            "p99": 39.10837499279296
+          },
+          "command_roundtrip_ms": {
+            "n": 4510,
+            "mean": 38.508759998674016,
+            "p95": 87.60995900229318,
+            "p99": 152.62841599906096
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 9559,
+          "commands": 4510
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 91,
+      "processes": [
+        "73147  40.2  44992 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  46.0  62624 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891406.687915,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 3503,
+            "mean": 49.062517841849846,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 3503,
+            "mean": 40.564408455119185,
+            "p95": 87.0861250004964,
+            "p99": 138.76975000312086
+          },
+          "tick_ms": {
+            "n": 4163,
+            "mean": 27.94390899283218,
+            "p95": 56.7453750045388,
+            "p99": 95.05499999795575
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 3503,
+        "hz": 9.583021761166387,
+        "activeRooms": 2
+      },
+      "server": {
+        "at": 1794891407.4095502,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 6000,
+            "mean": 9350.1785,
+            "p95": 11627,
+            "p99": 13295
+          },
+          "command_processing_ms": {
+            "n": 5849,
+            "mean": 6.7800816980180505,
+            "p95": 28.48200000153156,
+            "p99": 43.95599999406841
+          },
+          "command_roundtrip_ms": {
+            "n": 5716,
+            "mean": 45.61093267773589,
+            "p95": 105.27833399828523,
+            "p99": 255.7061249972321
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 10143,
+          "commands": 5716
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 105,
+      "processes": [
+        "73147  43.0  44816 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  37.8  98208 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891422.171211,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 3638,
+            "mean": 49.739142385926336,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 3638,
+            "mean": 41.87112377192418,
+            "p95": 89.19724999577738,
+            "p99": 144.1389999963576
+          },
+          "tick_ms": {
+            "n": 4433,
+            "mean": 28.125933051480015,
+            "p95": 57.43641599838156,
+            "p99": 98.46379199734656
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 3638,
+        "hz": 9.547868733297017,
+        "activeRooms": 2
+      },
+      "server": {
+        "at": 1794891421.8985448,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 6000,
+            "mean": 9317.237833333333,
+            "p95": 11627,
+            "p99": 13295
+          },
+          "command_processing_ms": {
+            "n": 6000,
+            "mean": 7.574706895182317,
+            "p95": 31.308958001318388,
+            "p99": 49.021375001757406
+          },
+          "command_roundtrip_ms": {
+            "n": 6000,
+            "mean": 50.063863170488425,
+            "p95": 113.68712500552647,
+            "p99": 287.78445899661165
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 10584,
+          "commands": 6745
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 120,
+      "processes": [
+        "73147  37.0  46624 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  57.8  99584 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891436.7268522,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 3773,
+            "mean": 50.4868804664723,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 3773,
+            "mean": 42.90855359059788,
+            "p95": 89.83887499925913,
+            "p99": 147.53108399600023
+          },
+          "tick_ms": {
+            "n": 4703,
+            "mean": 28.19814765389434,
+            "p95": 57.43641599838156,
+            "p99": 99.14604100049473
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 3773,
+        "hz": 9.537817341104356,
+        "activeRooms": 2
+      },
+      "server": {
+        "at": 1794891437.1412401,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 6000,
+            "mean": 9279.573666666667,
+            "p95": 11627,
+            "p99": 13295
+          },
+          "command_processing_ms": {
+            "n": 6000,
+            "mean": 8.385251461353619,
+            "p95": 37.74333299952559,
+            "p99": 54.100332999951206
+          },
+          "command_roundtrip_ms": {
+            "n": 6000,
+            "mean": 53.926656974651756,
+            "p95": 121.1662920031813,
+            "p99": 298.2324589975178
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 11110,
+          "commands": 7816
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 135,
+      "processes": [
+        "73147  49.2  45456 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  42.7  96768 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application",
+        "74393  49.1  51824 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker"
+      ],
+      "worker": {
+        "at": 1794891452.509612,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 3923,
+            "mean": 51.26663267907214,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 3923,
+            "mean": 43.703727926688444,
+            "p95": 90.39774999837391,
+            "p99": 147.53108399600023
+          },
+          "tick_ms": {
+            "n": 4986,
+            "mean": 28.192201212635428,
+            "p95": 57.61450000136392,
+            "p99": 101.69441600010032
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 3923,
+        "hz": 9.536495552850436,
+        "activeRooms": 2
+      },
+      "server": {
+        "at": 1794891452.40666,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 6000,
+            "mean": 9271.4875,
+            "p95": 11627,
+            "p99": 13295
+          },
+          "command_processing_ms": {
+            "n": 6000,
+            "mean": 9.195896531713515,
+            "p95": 41.30237500066869,
+            "p99": 59.92854199575959
+          },
+          "command_roundtrip_ms": {
+            "n": 6000,
+            "mean": 57.47089419201681,
+            "p95": 130.92933299776632,
+            "p99": 298.2324589975178
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 11625,
+          "commands": 9082
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 150,
+      "processes": [
+        "73147  46.2  47584 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  56.3  99664 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891467.320967,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 4061,
+            "mean": 52.14356069933514,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 4061,
+            "mean": 44.80315107989949,
+            "p95": 91.33708300214494,
+            "p99": 149.09383399935905
+          },
+          "tick_ms": {
+            "n": 5262,
+            "mean": 28.346053526459816,
+            "p95": 57.31366699910723,
+            "p99": 101.69441600010032
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 4061,
+        "hz": 9.528858061909613,
+        "activeRooms": 2
+      },
+      "server": {
+        "at": 1794891466.594164,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 6000,
+            "mean": 9255.651166666667,
+            "p95": 11627,
+            "p99": 13295
+          },
+          "command_processing_ms": {
+            "n": 6000,
+            "mean": 10.05177482339665,
+            "p95": 43.10587499639951,
+            "p99": 65.38887500209967
+          },
+          "command_roundtrip_ms": {
+            "n": 6000,
+            "mean": 62.01853659119903,
+            "p95": 146.00929199514212,
+            "p99": 314.0170000042417
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 11928,
+          "commands": 10126
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 165,
+      "processes": [
+        "73147  44.0  44848 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  60.5  63936 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891482.140696,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 4198,
+            "mean": 53.00166746069557,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 4198,
+            "mean": 45.76223285908329,
+            "p95": 91.24045800126623,
+            "p99": 152.6651669992134
+          },
+          "tick_ms": {
+            "n": 5536,
+            "mean": 28.40905537087339,
+            "p95": 56.852333997085225,
+            "p99": 101.69441600010032
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 4198,
+        "hz": 9.51930143590569,
+        "activeRooms": 2
+      },
+      "server": {
+        "at": 1794891481.82421,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 6000,
+            "mean": 9242.486833333332,
+            "p95": 11627,
+            "p99": 13295
+          },
+          "command_processing_ms": {
+            "n": 6000,
+            "mean": 10.429773488050463,
+            "p95": 43.79499999777181,
+            "p99": 67.88837500062073
+          },
+          "command_roundtrip_ms": {
+            "n": 6000,
+            "mean": 66.56119262487603,
+            "p95": 155.13291700335685,
+            "p99": 316.87324999802513
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 12293,
+          "commands": 11433
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 180,
+      "processes": [
+        "73147  38.3  45744 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  49.6  68432 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891496.787991,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 4340,
+            "mean": 53.005760368663594,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 4340,
+            "mean": 45.79314239824946,
+            "p95": 90.5645419989014,
+            "p99": 149.9648749959306
+          },
+          "tick_ms": {
+            "n": 5763,
+            "mean": 28.24277996740019,
+            "p95": 56.717125000432134,
+            "p99": 100.4466250014957
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 4340,
+        "hz": 9.524916214418662,
+        "activeRooms": 2
+      },
+      "server": {
+        "at": 1794891496.385211,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 6000,
+            "mean": 9245.341666666667,
+            "p95": 12795,
+            "p99": 13295
+          },
+          "command_processing_ms": {
+            "n": 6000,
+            "mean": 7.9152937373037275,
+            "p95": 41.090666003583465,
+            "p99": 51.736707995587494
+          },
+          "command_roundtrip_ms": {
+            "n": 6000,
+            "mean": 64.01651652355213,
+            "p95": 148.04295799694955,
+            "p99": 232.61412500141887
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 12710,
+          "commands": 12280
+        }
+      }
+    },
+    {
+      "elapsedSeconds": 181,
+      "processes": [
+        "73147  35.7  45840 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python manage.py run_game_worker",
+        "73519  35.5 100560 /opt/homebrew/Cellar/python@3.12/3.12.12_2/Frameworks/Python.framework/Versions/3.12/Resources/Python.app/Contents/MacOS/Python venv/bin/daphne -b 127.0.0.1 -p 8000 config.asgi:application"
+      ],
+      "worker": {
+        "at": 1794891497.957119,
+        "pid": 73147,
+        "stats": {
+          "cycle_sql": {
+            "n": 4349,
+            "mean": 53.04667739710278,
+            "p95": 89,
+            "p99": 92
+          },
+          "cycle_ms": {
+            "n": 4349,
+            "mean": 45.89468022520419,
+            "p95": 90.99199999764096,
+            "p99": 152.5456250019488
+          },
+          "tick_ms": {
+            "n": 5781,
+            "mean": 28.28300214705716,
+            "p95": 56.852333997085225,
+            "p99": 101.69441600010032
+          }
+        },
+        "counts": {},
+        "leader": true,
+        "cycles": 4349,
+        "hz": 9.520240694866857,
+        "activeRooms": 2
+      },
+      "server": {
+        "at": 1794891497.456673,
+        "pid": 73519,
+        "stats": {
+          "snapshot_bytes": {
+            "n": 6000,
+            "mean": 9243.711166666666,
+            "p95": 12795,
+            "p99": 13295
+          },
+          "command_processing_ms": {
+            "n": 6000,
+            "mean": 7.9382518543000815,
+            "p95": 41.090666003583465,
+            "p99": 52.829416999884415
+          },
+          "command_roundtrip_ms": {
+            "n": 6000,
+            "mean": 64.79239575872877,
+            "p95": 151.34633299749112,
+            "p99": 232.61412500141887
+          }
+        },
+        "counts": {
+          "snapshot_pairs": 12731,
+          "commands": 12354
+        }
+      }
+    }
+  ],
+  "environment": "Local development machine, real PostgreSQL/Redis/Daphne/clock and 20 active bots. Not a Northflank Free performance claim."
+}
