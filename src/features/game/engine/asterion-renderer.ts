@@ -20,6 +20,16 @@ export const palette = [
   "#86d8f0",
   "#d8e7e4",
   "#b4ce76",
+  "#f05d36",
+  "#348f85",
+  "#c88f5c",
+  "#6684d8",
+  "#df5792",
+  "#bddd3e",
+  "#debb42",
+  "#a26bca",
+  "#6e7c8e",
+  "#e9cbb7",
 ];
 const intersects = (a: Rect, b: Rect) =>
   a.x < b.x + b.width &&
@@ -271,7 +281,7 @@ export class StationRenderer {
       ctx.save();
       ctx.translate(b.x, b.y);
       ctx.rotate(-0.25);
-      ctx.fillStyle = palette[(b.color || 0) % 10];
+      ctx.fillStyle = palette[(b.color || 0) % palette.length];
       ctx.strokeStyle = "#071525";
       ctx.lineWidth = 4;
       ctx.beginPath();
@@ -308,7 +318,8 @@ export class StationRenderer {
         {
           id: p.id,
           position: pos,
-          color: palette[(p.color || 0) % 10],
+          color: palette[(p.color || 0) % palette.length],
+          variant:p.color||0,
           facing: dx < 0 ? -1 : 1,
           moving: Math.hypot(dx, dy) > 1,
           label: p.nickname,

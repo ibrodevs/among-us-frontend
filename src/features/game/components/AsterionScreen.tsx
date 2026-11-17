@@ -1,4 +1,5 @@
 "use client";
+import { PlayerBadge } from "./PlayerBadge";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { gameApi } from "@/lib/api";
@@ -16,9 +17,28 @@ import { StationMap } from "./StationMap";
 import { GameControls } from "./GameHud";
 import { sound } from "../../audio/events";
 import css from "./asterion.module.css";
-const terminalNames:Record<string,string>={cameras:"Камеры станции",admin:"Сводка Admin",vitals:"Состояние экипажа"};
-const roleNames:Record<string,string>={technician:'Техник',medic:'Медик',tracker:'Следопыт',guardian:'Хранитель',mimic:'Мимик'};
-const roleHelp:Record<string,string>={technician:'Тоннели доступны до 20 секунд. После выхода — 30 секунд перезарядки.',medic:'Терминал Vitals показывает состояние экипажа с задержкой 5 секунд.',tracker:'Показывает последнюю известную зону на 8 секунд. Перезарядка — 35 секунд.',guardian:'После гибели можно дважды защитить живого игрока на 10 секунд.',mimic:'Облик выбранного игрока действует 12 секунд. Перезарядка — 45 секунд.'};
+const terminalNames: Record<string, string> = {
+  cameras: "Камеры станции",
+  admin: "Сводка Admin",
+  vitals: "Состояние экипажа",
+};
+const roleNames: Record<string, string> = {
+  technician: "Техник",
+  medic: "Медик",
+  tracker: "Следопыт",
+  guardian: "Хранитель",
+  mimic: "Мимик",
+};
+const roleHelp: Record<string, string> = {
+  technician:
+    "Тоннели доступны до 20 секунд. После выхода — 30 секунд перезарядки.",
+  medic: "Терминал Vitals показывает состояние экипажа с задержкой 5 секунд.",
+  tracker:
+    "Показывает последнюю известную зону на 8 секунд. Перезарядка — 35 секунд.",
+  guardian: "После гибели можно дважды защитить живого игрока на 10 секунд.",
+  mimic:
+    "Облик выбранного игрока действует 12 секунд. Перезарядка — 45 секунд.",
+};
 export function AsterionScreen({
   code,
   net,
@@ -38,13 +58,13 @@ export function AsterionScreen({
   useEffect(() => {
     if (net.error) sound("ui.error");
   }, [net.error]);
-  const observing=Boolean(own?.observation);
+  const observing = Boolean(own?.observation);
   const close = useCallback(() => {
     setTaskId(null);
     setMap(null);
     setHolding(false);
-    if(observing)send({type:"terminal.use",terminal_id:""});
-  }, [observing,send]);
+    if (observing) send({ type: "terminal.use", terminal_id: "" });
+  }, [observing, send]);
   const paused =
     status !== "connected" ||
     snapshot?.phase !== "playing" ||
@@ -193,8 +213,10 @@ export function AsterionScreen({
         .map((p) => ({ ...p, sabotage_id: s.id, kind: s.kind })),
     )
     .find((p) => distance(p) <= 90);
-  const remaining=(stamp?:string|null)=>Math.max(0,Math.ceil((Date.parse(stamp||" ")-now)/1000))||0;
-  const ventCooldown=remaining(own.vent_available_at),abilityCooldown=remaining(own.ability_available_at);
+  const remaining = (stamp?: string | null) =>
+    Math.max(0, Math.ceil((Date.parse(stamp || " ") - now) / 1000)) || 0;
+  const ventCooldown = remaining(own.vent_available_at),
+    abilityCooldown = remaining(own.ability_available_at);
   const killCooldown =
     Math.max(
       0,
@@ -304,11 +326,16 @@ export function AsterionScreen({
                   ? "Экипаж"
                   : "Предатель"
                 : "Призрак · задания доступны"}{" "}
-              {own.special_role && `· ${roleNames[own.special_role]||own.special_role}`}
+              {own.special_role &&
+                `· ${roleNames[own.special_role] || own.special_role}`}
             </span>
           </div>
           <div className={css.viewport}>
-            <AsterionCanvas snapshot={snapshot} playerId={playerId} tasks={own.tasks} />
+            <AsterionCanvas
+              snapshot={snapshot}
+              playerId={playerId}
+              tasks={own.tasks}
+            />
           </div>
           <GameControls
             analog
@@ -352,7 +379,7 @@ export function AsterionScreen({
                 className="action secondary"
                 disabled={
                   !own.alive ||
-                  ventCooldown>0 ||
+                  ventCooldown > 0 ||
                   status !== "connected" ||
                   (!vent && !own.is_in_vent)
                 }
@@ -362,7 +389,8 @@ export function AsterionScreen({
                     : vent && send({ type: "vent.enter", vent_id: vent.id })
                 }
               >
-                {own.is_in_vent ? "Выйти из люка" : "Люк"}{ventCooldown>0?` · ${ventCooldown} с`:""}
+                {own.is_in_vent ? "Выйти из люка" : "Люк"}
+                {ventCooldown > 0 ? ` · ${ventCooldown} с` : ""}
               </button>
             )}
             <button
@@ -430,13 +458,23 @@ export function AsterionScreen({
           {own.is_in_vent && (
             <section className={css.terminal}>
               <h2>Сеть тоннелей</h2>
-              <p>Текущее положение: {station.rooms.find(r=>r.id===station.vents.find(v=>v.id===own.current_vent_id)?.room_id)?.name}</p>
+              <p>
+                Текущее положение:{" "}
+                {
+                  station.rooms.find(
+                    (r) =>
+                      r.id ===
+                      station.vents.find((v) => v.id === own.current_vent_id)
+                        ?.room_id,
+                  )?.name
+                }
+              </p>
               <div className={css.actions}>
                 {own.vent_connections?.map((v) => (
                   <button
                     key={v.id}
                     className="action"
-                    disabled={ventCooldown>0}
+                    disabled={ventCooldown > 0}
                     onClick={() => send({ type: "vent.travel", vent_id: v.id })}
                   >
                     {station.rooms.find((r) => r.id === v.room_id)?.name}
@@ -487,57 +525,144 @@ export function AsterionScreen({
               </section>
             )}
           {own.observation && (
-            <div className="modal-backdrop"><section className={`modal ${css.task}`} role="dialog" aria-modal="true" aria-labelledby="terminal-title">
-              <h2 id="terminal-title">{terminalNames[own.observation.type]}</h2>
-              <button
-                autoFocus
-                className="action secondary"
-                onClick={() => send({ type: "terminal.use", terminal_id: "" })}
+            <div className="modal-backdrop">
+              <section
+                className={`modal ${css.task}`}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="terminal-title"
               >
-                Закрыть терминал
-              </button>
-              {own.observation.type==='admin'&&<svg className={css.map} viewBox="0 0 6144 4096" style={{maxHeight:250}} role="img" aria-label="Количество людей по помещениям"><g fill="#30465a" stroke="#7697ad" strokeWidth="9">{station.corridors.map(c=><rect key={c.id} {...c.bounds}/>)}{station.rooms.map(r=><g key={r.id} opacity={snapshot.map_mode==='compact'&&!r.compact?0.2:1}><title>{r.name}: {own.observation?.counts?.[r.id]||0}</title><rect {...r.bounds} rx="25" fill={(own.observation?.counts?.[r.id]||0)>0?'#2e665c':'#203748'}/><text x={r.bounds.x+450} y={r.bounds.y+300} fill="#fff" stroke="none" fontSize="160" textAnchor="middle">{own.observation?.counts?.[r.id]||0}</text></g>)}</g></svg>}
-              {own.observation.type === "admin" &&
-                Object.entries(own.observation.counts || {}).map(([id, n]) => (
-                  <p key={id}>
-                    {station.rooms.find((r) => r.id === id)?.name}: {n}
-                  </p>
-                ))}
-              {own.observation.type === "vitals" &&
-                own.observation.players?.map((p) => (
-                  <p key={p.id}>
-                    {snapshot.roster?.find((r) => r.id === p.id)?.nickname}:{" "}
-                    {p.status==="dead"?"Погиб":"Жив"}
-                  </p>
-                ))}
-              {own.observation.type === "cameras" && (
-                <>
-                  <label>
-                    Камера
-                    <select
-                      aria-label="Камера"
-                      value={own.observation.camera?.id}
-                      onChange={(e) =>
-                        send({
-                          type: "terminal.use",
-                          terminal_id: "security",
-                          camera_id: e.target.value,
-                        })
-                      }
-                    >
-                      {station.cameras.map((c) => (
-                        <option value={c.id} key={c.id}>
-                          {station.rooms.find((r) => r.id === c.room_id)
-                            ?.name || c.id}
-                        </option>
+                <h2 id="terminal-title">
+                  {terminalNames[own.observation.type]}
+                </h2>
+                <button
+                  autoFocus
+                  className="action secondary"
+                  onClick={() =>
+                    send({ type: "terminal.use", terminal_id: "" })
+                  }
+                >
+                  Закрыть терминал
+                </button>
+                {own.observation.type === "admin" && (
+                  <svg
+                    className={css.map}
+                    viewBox="0 0 6144 4096"
+                    style={{ maxHeight: 250 }}
+                    role="img"
+                    aria-label="Количество людей по помещениям"
+                  >
+                    <g fill="#30465a" stroke="#7697ad" strokeWidth="9">
+                      {station.corridors.map((c) => (
+                        <rect key={c.id} {...c.bounds} />
                       ))}
-                    </select>
-                  </label>
-                  {own.observation.camera&&<div className={css.viewport} style={{height:320,minHeight:240}} aria-label="Изображение камеры"><AsterionCanvas key={own.observation.camera.id} playerId="camera-monitor" camera={own.observation.camera} snapshot={{...snapshot,vision_radius:own.observation.camera.radius,players:(own.observation.players||[]).map(p=>({id:p.id,nickname:p.nickname||'',x:p.x||0,y:p.y||0,color:p.color,alive:true})),bodies:own.observation.bodies||[],effects:own.observation.effects||[]}}/></div>}
-
-                </>
-              )}
-            </section></div>
+                      {station.rooms.map((r) => (
+                        <g
+                          key={r.id}
+                          opacity={
+                            snapshot.map_mode === "compact" && !r.compact
+                              ? 0.2
+                              : 1
+                          }
+                        >
+                          <title>
+                            {r.name}: {own.observation?.counts?.[r.id] || 0}
+                          </title>
+                          <rect
+                            {...r.bounds}
+                            rx="25"
+                            fill={
+                              (own.observation?.counts?.[r.id] || 0) > 0
+                                ? "#2e665c"
+                                : "#203748"
+                            }
+                          />
+                          <text
+                            x={r.bounds.x + 450}
+                            y={r.bounds.y + 300}
+                            fill="#fff"
+                            stroke="none"
+                            fontSize="160"
+                            textAnchor="middle"
+                          >
+                            {own.observation?.counts?.[r.id] || 0}
+                          </text>
+                        </g>
+                      ))}
+                    </g>
+                  </svg>
+                )}
+                {own.observation.type === "admin" &&
+                  Object.entries(own.observation.counts || {}).map(
+                    ([id, n]) => (
+                      <p key={id}>
+                        {station.rooms.find((r) => r.id === id)?.name}: {n}
+                      </p>
+                    ),
+                  )}
+                {own.observation.type === "vitals" &&
+                  own.observation.players?.map((p) => (
+                    <p key={p.id}>
+                      {snapshot.roster?.find((r) => r.id === p.id)?.nickname}:{" "}
+                      {p.status === "dead" ? "Погиб" : "Жив"}
+                    </p>
+                  ))}
+                {own.observation.type === "cameras" && (
+                  <>
+                    <label>
+                      Камера
+                      <select
+                        aria-label="Камера"
+                        value={own.observation.camera?.id}
+                        onChange={(e) =>
+                          send({
+                            type: "terminal.use",
+                            terminal_id: "security",
+                            camera_id: e.target.value,
+                          })
+                        }
+                      >
+                        {station.cameras.map((c) => (
+                          <option value={c.id} key={c.id}>
+                            {station.rooms.find((r) => r.id === c.room_id)
+                              ?.name || c.id}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    {own.observation.camera && (
+                      <div
+                        className={css.viewport}
+                        style={{ height: 320, minHeight: 240 }}
+                        aria-label="Изображение камеры"
+                      >
+                        <AsterionCanvas
+                          key={own.observation.camera.id}
+                          playerId="camera-monitor"
+                          camera={own.observation.camera}
+                          snapshot={{
+                            ...snapshot,
+                            vision_radius: own.observation.camera.radius,
+                            players: (own.observation.players || []).map(
+                              (p) => ({
+                                id: p.id,
+                                nickname: p.nickname || "",
+                                x: p.x || 0,
+                                y: p.y || 0,
+                                color: p.color,
+                                alive: true,
+                              }),
+                            ),
+                            bodies: own.observation.bodies || [],
+                            effects: own.observation.effects || [],
+                          }}
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
+              </section>
+            </div>
           )}
         </section>
         <aside className={css.aside}>
@@ -563,7 +688,70 @@ export function AsterionScreen({
               {t.stage_total || 1}
             </button>
           ))}
-          {own.special_role&&<><h3>{roleNames[own.special_role]||own.special_role}</h3><p>{roleHelp[own.special_role]}</p>{['tracker','mimic','guardian'].includes(own.special_role)&&<><select aria-label="Цель способности" value={abilityTarget} onChange={e=>setAbilityTarget(e.target.value)}><option value="">Выберите игрока</option>{snapshot.roster?.filter(p=>p.id!==playerId).map(p=><option key={p.id} value={p.id}>{p.nickname}</option>)}</select><button className="action" disabled={!abilityTarget||abilityCooldown>0||paused||(!own.alive&&own.special_role!=='guardian')||(own.special_role==='guardian'&&Number(own.ability_state?.shields_used||0)>=2)} onClick={()=>send({type:'player.ability.use',target_player_id:abilityTarget})}>Применить способность{abilityCooldown?` · ${abilityCooldown} с`:''}</button></>}{own.special_role==='guardian'&&<p>Использовано защит: {Number(own.ability_state?.shields_used||0)} / 2</p>}{Boolean(own.ability_state?.tracking)&&Date.parse((own.ability_state?.tracking as {until:string}).until)>now&&<p>Последняя зона: {station.rooms.find(r=>r.id===(own.ability_state?.tracking as {room_id:string}).room_id)?.name||'неизвестна'}</p>}</>}
+          {own.special_role && (
+            <>
+              <h3>{roleNames[own.special_role] || own.special_role}</h3>
+              <p>{roleHelp[own.special_role]}</p>
+              {["tracker", "mimic", "guardian"].includes(own.special_role) && (
+                <>
+                  <select
+                    aria-label="Цель способности"
+                    value={abilityTarget}
+                    onChange={(e) => setAbilityTarget(e.target.value)}
+                  >
+                    <option value="">Выберите игрока</option>
+                    {snapshot.roster
+                      ?.filter((p) => p.id !== playerId)
+                      .map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.nickname}
+                        </option>
+                      ))}
+                  </select>
+                  <button
+                    className="action"
+                    disabled={
+                      !abilityTarget ||
+                      abilityCooldown > 0 ||
+                      paused ||
+                      (!own.alive && own.special_role !== "guardian") ||
+                      (own.special_role === "guardian" &&
+                        Number(own.ability_state?.shields_used || 0) >= 2)
+                    }
+                    onClick={() =>
+                      send({
+                        type: "player.ability.use",
+                        target_player_id: abilityTarget,
+                      })
+                    }
+                  >
+                    Применить способность
+                    {abilityCooldown ? ` · ${abilityCooldown} с` : ""}
+                  </button>
+                </>
+              )}
+              {own.special_role === "guardian" && (
+                <p>
+                  Использовано защит:{" "}
+                  {Number(own.ability_state?.shields_used || 0)} / 2
+                </p>
+              )}
+              {Boolean(own.ability_state?.tracking) &&
+                Date.parse(
+                  (own.ability_state?.tracking as { until: string }).until,
+                ) > now && (
+                  <p>
+                    Последняя зона:{" "}
+                    {station.rooms.find(
+                      (r) =>
+                        r.id ===
+                        (own.ability_state?.tracking as { room_id: string })
+                          .room_id,
+                    )?.name || "неизвестна"}
+                  </p>
+                )}
+            </>
+          )}
           <p className="muted">
             M — карта · Esc — закрыть панель. После гибели продолжайте выполнять
             задания.
@@ -665,6 +853,9 @@ export function AsterionScreen({
                         send({ type: "vote.cast", target_player_id: p.id })
                       }
                     >
+                      <span aria-hidden="true">
+                        <PlayerBadge color={p.color || 0} size={30} />
+                      </span>
                       {p.nickname}
                     </button>
                   ))}
@@ -677,6 +868,16 @@ export function AsterionScreen({
                 >
                   Пропустить
                 </button>
+                {own.has_voted && <p role="status">Голос принят ✓</p>}
+                {snapshot.players.some((p) => !p.alive) && (
+                  <p>
+                    Погибли:{" "}
+                    {snapshot.players
+                      .filter((p) => !p.alive)
+                      .map((p) => p.nickname)
+                      .join(", ")}
+                  </p>
+                )}
                 <p>
                   Принято голосов: {snapshot.meeting.votes_cast}/
                   {snapshot.meeting.alive_voters}

@@ -21,10 +21,10 @@ export async function walk(c: Client, target: { x: number; y: number }) {
     free = (x: number, y: number) =>
       !walls.some(
         (r) =>
-          x - 35 < r.x + r.width &&
-          x + 35 > r.x &&
-          y - 35 < r.y + r.height &&
-          y + 35 > r.y,
+          x - 24 < r.x + r.width &&
+          x + 24 > r.x &&
+          y - 24 < r.y + r.height &&
+          y + 24 > r.y,
       );
   const key = (x: number, y: number) => y * w + x,
     startX = Math.floor(c.own!.x! / size),
@@ -77,7 +77,7 @@ export async function walk(c: Client, target: { x: number; y: number }) {
     for (let attempt = 0; attempt < 35; attempt++) {
       const position = { x: c.own!.x!, y: c.own!.y! };
       const axes = (["x", "y"] as const).filter(
-        (axis) => Math.abs(p[axis] - position[axis]) >= 18,
+        (axis) => Math.abs(p[axis] - position[axis]) >= 8,
       );
       if (!axes.length) break;
       const canTravel = (axis: "x" | "y") => {
@@ -117,7 +117,7 @@ export async function walk(c: Client, target: { x: number; y: number }) {
       const ackBefore = c.own!.last_move_seq;
       await c.page.keyboard.down(key);
       await sleep(
-        Math.max(120, Math.min(900, ((Math.abs(delta) - 8) / 220) * 1000)),
+        Math.max(40, Math.min(900, ((Math.abs(delta) - 3) / 220) * 1000)),
       );
       await c.page.keyboard.up(key);
       await expect

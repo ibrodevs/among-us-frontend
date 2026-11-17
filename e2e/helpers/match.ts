@@ -37,12 +37,24 @@ export async function match(
     });
     guests.push(g);
     if (!code)
-      code = (await post("/api/v1/rooms/", { max_players: 4 }, g.token)).code;
+      code = (
+        await post(
+          "/api/v1/rooms/",
+          { max_players: 4, impostor_count: 1 },
+          g.token,
+        )
+      ).code;
     else await post("/api/v1/rooms/join/", { code }, g.token);
   }
   await post(
     `/api/v1/rooms/${code}/settings/`,
-    { map_version: 2, discussion_seconds: 10, voting_seconds: 15, ...settings },
+    {
+      map_version: 2,
+      impostor_count: 1,
+      discussion_seconds: 10,
+      voting_seconds: 15,
+      ...settings,
+    },
     guests[0].token,
     "PATCH",
   );

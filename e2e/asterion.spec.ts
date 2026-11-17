@@ -52,12 +52,14 @@ for (const count of [4, 10])
         }
       }
       const host = clients[0];
-      await expect(host.page.getByText(`Игроки: ${count} / 10`)).toBeVisible();
+      await expect(
+        host.page.getByText(`Игроки: ${count} / 20`, { exact: true }),
+      ).toBeVisible();
       await host.page
-        .getByRole("button", { name: "Цвет 8", exact: true })
+        .getByRole("button", { name: "Цвет 20", exact: true })
         .click();
       await expect(
-        host.page.getByRole("button", { name: "Цвет 8", exact: true }),
+        host.page.getByRole("button", { name: "Цвет 20", exact: true }),
       ).toHaveAttribute("aria-pressed", "true");
       await host.page.getByText("Настройки матча", { exact: false }).click();
       await host.page.getByLabel("Обсуждение, с", { exact: true }).fill("10");
@@ -66,6 +68,14 @@ for (const count of [4, 10])
         .getByRole("button", { name: "Сохранить настройки" })
         .click();
       await expect(host.page.getByText("Настройки сохранены")).toBeVisible();
+      if (count === 4) {
+        await host.page
+          .getByRole("button", { name: "Предателей: 1", exact: true })
+          .click();
+        await expect(
+          host.page.getByRole("button", { name: "Начать игру", exact: true }),
+        ).toBeEnabled();
+      }
       await host.page.getByRole("button", { name: "Начать игру" }).click();
       for (const c of clients) {
         await expect.poll(() => c.snapshot?.protocol_version).toBe(2);
@@ -83,7 +93,7 @@ for (const count of [4, 10])
           ),
         ).toBeTruthy();
       }
-      expect(host.own?.color).toBe(7);
+      expect(host.own?.color).toBe(19);
       const mobile = clients[3],
         beforeTouch = mobile.own!.x!;
       const button = await mobile.page

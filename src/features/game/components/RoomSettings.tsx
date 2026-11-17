@@ -1,14 +1,18 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { gameApi } from "@/lib/api";
 export function RoomSettings({
   code,
   token,
   isHost,
+  serverSettings,
+  playerCount = 0,
 }: {
   code: string;
   token: string;
   isHost: boolean;
+  serverSettings?: Record<string, number | string | boolean>;
+  playerCount?: number;
 }) {
   const [settings, setSettings] = useState<Record<
       string,
@@ -16,6 +20,14 @@ export function RoomSettings({
     > | null>(null),
     [error, setError] = useState(""),
     [saved, setSaved] = useState(false);
+  const previousServer = useRef("");
+  useEffect(() => {
+    const key = JSON.stringify(serverSettings);
+    if (serverSettings && key !== previousServer.current) {
+      previousServer.current = key;
+      setSettings(serverSettings);
+    }
+  }, [serverSettings]);
   useEffect(() => {
     let active = true;
     gameApi
@@ -42,6 +54,56 @@ export function RoomSettings({
         {settings.map_version === 2 ? "Asterion" : "Орбита v1"}
       </summary>
       <fieldset disabled={!isHost}>
+        <fieldset>
+          <legend>Количество предателей</legend>
+          <div className="row" role="group" aria-label="Количество предателей">
+            {[1, 2, 3].map((count) => (
+              <button
+                type="button"
+                className={
+                  Number(settings.impostor_count) === count
+                    ? "action"
+                    : "action secondary"
+                }
+                key={count}
+                aria-label={`Предателей: ${count}`}
+                aria-pressed={Number(settings.impostor_count) === count}
+                onClick={() => {
+                  change("impostor_count", count);
+                  gameApi
+                    .saveSettings(token, code, { impostor_count: count })
+                    .then((s) => {
+                      setSettings(s);
+                      setSaved(true);
+                      setError("");
+                    })
+                    .catch((e) => {
+                      setError(e.message);
+                      void gameApi.getSettings(token, code).then(setSettings);
+                    });
+                }}
+              >
+                {count}
+              </button>
+            ))}
+          </div>
+          <p>
+            Выбрано: {Number(settings.impostor_count) || 2} · Игроки:{" "}
+            {playerCount} / {Number(settings.max_players)}
+          </p>
+          <p>
+            {playerCount >=
+            ({ 1: 4, 2: 7, 3: 10 }[
+              Number(settings.impostor_count) as 1 | 2 | 3
+            ] || 7)
+              ? "Комната готова к старту"
+              : `Для ${Number(settings.impostor_count) || 2} предателей требуется минимум ${{ 1: 4, 2: 7, 3: 10 }[Number(settings.impostor_count) as 1 | 2 | 3] || 7} игроков`}
+          </p>
+          <small>
+            Рекомендация: {playerCount < 7 ? 1 : playerCount < 13 ? 2 : 3}.
+            Решение принимает хозяин.
+          </small>
+        </fieldset>
         <label>
           Карта
           <select
@@ -60,14 +122,14 @@ export function RoomSettings({
             value={String(settings.area)}
             onChange={(e) => change("area", e.target.value)}
           >
-            <option value="auto">Авто · 4–7 компактная / 8–10 полная</option>
+            <option value="auto">Авто · 4–7 компактная / 8–20 полная</option>
             <option value="compact">Компактная</option>
             <option value="full">Полная</option>
           </select>
         </label>
         <div className="stack">
           {[
-            ["max_players", "Максимум игроков", 4, 10],
+            ["max_players", "Максимум игроков", 4, 20],
             ["speed", "Скорость", 200, 230],
             ["discussion_seconds", "Обсуждение, с", 5, 120],
             ["voting_seconds", "Голосование, с", 5, 120],

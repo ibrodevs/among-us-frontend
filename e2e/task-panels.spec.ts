@@ -50,7 +50,7 @@ test("all 20 real task panels submit through WebSocket to Django validators", as
       });
       guests.push(g);
       if (i === 0)
-        code = (await post("/api/v1/rooms/", { max_players: 4 }, g.token)).code;
+        code = (await post("/api/v1/rooms/", { max_players: 4,impostor_count:1 }, g.token)).code;
       else await post("/api/v1/rooms/join/", { code }, g.token);
     }
     await post(`/api/v1/games/${code}/start/`, {}, guests[0].token);

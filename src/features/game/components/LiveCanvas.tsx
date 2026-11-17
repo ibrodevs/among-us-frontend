@@ -6,18 +6,7 @@ import { mapConfig } from "../engine/map-config";
 import type { PlayerVisualState } from "../engine/types";
 import type { Snapshot } from "../network/types";
 import styles from "../game.module.css";
-const colors = [
-  "#58cc02",
-  "#1cb0f6",
-  "#d7ffb8",
-  "#ffffff",
-  "#a5ed6e",
-  "#777777",
-  "#58cc02",
-  "#1cb0f6",
-  "#d7ffb8",
-  "#ffffff",
-];
+import { palette as colors } from "../engine/asterion-renderer";
 
 export function LiveCanvas({
   snapshot,

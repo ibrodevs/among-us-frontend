@@ -1,3 +1,5 @@
+> Historical v1 contract. Current CREWMATE X release uses Asterion protocol v2, 4–20 seats (default 20), host-selected `impostor_count` 1/2/3 (default 2) and start minimums 4/7/10. See [capacity notes](capacity-20/README.md) and [WS events](WS-EVENTS.md). `POST rooms/` accepts both `max_players` and `impostor_count`; settings are public, roles/tasks remain private. Full rooms return 409 with `code: ROOM_FULL`.
+
 # API and WebSocket Contract v1 (frozen for feature branches)
 
 ## REST base and error convention

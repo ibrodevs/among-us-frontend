@@ -149,15 +149,27 @@ for (const count of [4, 10])
         await expect(c.page).toHaveURL(/\/room\/[A-Z0-9]{6}/);
       }
       const host = clients[0];
-      await expect(host.page.getByText(`Игроки: ${count} / 10`)).toBeVisible();
+      await expect(
+        host.page.getByText(`Игроки: ${count} / 20`, { exact: true }),
+      ).toBeVisible();
       await host.page.screenshot({
         path: `test-results/lobby-${count}.png`,
         fullPage: true,
       });
-      await host.page.getByText("Настройки матча",{exact:false}).click();
-      await host.page.getByLabel("Карта",{exact:true}).selectOption("1");
-      await host.page.getByRole("button",{name:"Сохранить настройки"}).click();
+      await host.page.getByText("Настройки матча", { exact: false }).click();
+      await host.page.getByLabel("Карта", { exact: true }).selectOption("1");
+      await host.page
+        .getByRole("button", { name: "Сохранить настройки" })
+        .click();
       await expect(host.page.getByText("Настройки сохранены")).toBeVisible();
+      if (count === 4) {
+        await host.page
+          .getByRole("button", { name: "Предателей: 1", exact: true })
+          .click();
+        await expect(
+          host.page.getByRole("button", { name: "Начать игру", exact: true }),
+        ).toBeEnabled();
+      }
       await host.page.getByRole("button", { name: "Начать игру" }).click();
       for (const c of clients)
         await expect
@@ -360,10 +372,24 @@ test("all three real task dialogs, kill, report, skip vote and impostor victory"
       }
       await expect(c.page).toHaveURL(/\/room\/[A-Z0-9]{6}/);
     }
+    await clients[0].page
+      .getByText("Настройки матча", { exact: false })
+      .click();
+    await clients[0].page
+      .getByLabel("Карта", { exact: true })
+      .selectOption("1");
+    await clients[0].page
+      .getByRole("button", { name: "Сохранить настройки" })
+      .click();
+    await expect(
+      clients[0].page.getByText("Настройки сохранены"),
+    ).toBeVisible();
+    await clients[0].page
+      .getByRole("button", { name: "Предателей: 1", exact: true })
+      .click();
     await expect(
       clients[0].page.getByRole("button", { name: "Начать игру" }),
     ).toBeEnabled();
-    await clients[0].page.getByLabel("Карта", { exact: true }).selectOption("1");
     await clients[0].page.getByRole("button", { name: "Начать игру" }).click();
     for (const c of clients)
       await expect

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { gameApi } from "@/lib/api";
+import { PlayerBadge } from "./PlayerBadge";
 import { palette } from "../engine/asterion-renderer";
 export function ColorPicker({
   code,
@@ -27,7 +28,7 @@ export function ColorPicker({
           if (active) setError(e.message);
         });
     void refresh();
-    const id = setInterval(refresh, 2500);
+    const id = setInterval(refresh, 10000);
     return () => {
       active = false;
       clearInterval(id);
@@ -48,8 +49,8 @@ export function ColorPicker({
               (p) => p.player_id !== playerId && p.color === i,
             )}
             style={{
-              width: 42,
-              height: 42,
+              width: 54,
+              height: 62,
               borderRadius: 14,
               border: own === i ? "4px solid #042c60" : "2px solid #a7c5d2",
               background: color,
@@ -66,7 +67,8 @@ export function ColorPicker({
                 .catch((e) => setError(e.message));
             }}
           >
-            {own === i ? "✓" : i + 1}
+            <PlayerBadge color={i} size={34} />
+            <span>{own === i ? "✓" : i + 1}</span>
           </button>
         ))}
       </div>

@@ -46,7 +46,7 @@ export default function HomePage() {
         <Link className="wordmark" href="/">
           ✦ CREWMATE <span>X</span>
         </Link>
-        <span className="badge">4–10 друзей · 1 миссия</span>
+        <span className="badge">4–20 друзей · 1 миссия</span>
       </nav>
       <main>
         <section className="hero">
@@ -128,7 +128,7 @@ export default function HomePage() {
         </p>
         <div className="facts">
           <div>
-            <strong>4–10</strong>игроков в экипаже
+            <strong>4–20</strong>игроков в экипаже
           </div>
           <div>
             <strong>7 заданий</strong>на каждого исследователя

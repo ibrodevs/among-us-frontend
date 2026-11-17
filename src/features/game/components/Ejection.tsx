@@ -20,7 +20,7 @@ export function Ejection({
           <svg viewBox="0 0 80 90" aria-hidden="true">
             <path
               d="M20 28h40v43H20z"
-              fill={palette[color % 10]}
+              fill={palette[color % palette.length]}
               stroke="#081a34"
               strokeWidth="5"
             />
@@ -30,7 +30,7 @@ export function Ejection({
               width="52"
               height="35"
               rx="12"
-              fill={palette[color % 10]}
+              fill={palette[color % palette.length]}
               stroke="#081a34"
               strokeWidth="5"
             />

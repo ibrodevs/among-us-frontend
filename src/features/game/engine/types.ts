@@ -6,6 +6,7 @@ export type PlayerVisualState = {
   id: string;
   position: Vector2;
   color: string;
+  variant?:number;
   facing: -1 | 1;
   moving: boolean;
   label: string;

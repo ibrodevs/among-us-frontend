@@ -70,11 +70,11 @@ export const gameApi = {
       method: "POST",
       body: { nickname },
     }),
-  createRoom: (token: string, max_players = 10) =>
+  createRoom: (token: string, max_players = 20, impostor_count = 2) =>
     api<Room>("/api/v1/rooms/", {
       method: "POST",
       token,
-      body: { max_players },
+      body: { max_players, impostor_count },
     }),
   joinRoom: (token: string, code: string) =>
     api<Room>("/api/v1/rooms/join/", { method: "POST", token, body: { code } }),
