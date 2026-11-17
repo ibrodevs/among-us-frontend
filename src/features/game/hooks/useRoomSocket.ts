@@ -69,7 +69,7 @@ export function useRoomSocket(code: string) {
               return;
             }
             if (ws.readyState === WebSocket.OPEN) {
-              pingAt = Date.now();
+              pingAt = performance.now();
               ws.send(JSON.stringify({ type: "ping" }));
             }
           }, 15000);
@@ -93,7 +93,7 @@ export function useRoomSocket(code: string) {
               : previous,
           );
         } else if (message.type === "pong") {
-          setPing(Date.now() - pingAt);
+          if (pingAt) setPing(Math.round(performance.now() - pingAt));
         } else if (message.type === "error") {
           if (!["STALE_SEQ", "RATE_LIMITED"].includes(message.code))
             setError(message.detail);
