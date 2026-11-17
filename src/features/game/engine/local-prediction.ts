@@ -71,12 +71,12 @@ export class LocalMotionPredictor {
       if (x - hitbox < 0 || y - hitbox < 0 ||
           x + hitbox > map.width || y + hitbox > map.height) return true;
       if (ghost) return false;
-      return [...map.walls, ...doors].some(
-        (r) => x - hitbox < r.x + r.width &&
-          x + hitbox > r.x &&
-          y - hitbox < r.y + r.height &&
-          y + hitbox > r.y,
-      );
+      const overlaps = (r: Rect) =>
+        x - hitbox < r.x + r.width &&
+        x + hitbox > r.x &&
+        y - hitbox < r.y + r.height &&
+        y + hitbox > r.y;
+      return map.walls.some(overlaps) || doors.some(overlaps);
     };
     // Match the server's 20ms collision substeps to avoid crossing thin walls.
     const steps = Math.max(1, Math.ceil(seconds / 0.02));
