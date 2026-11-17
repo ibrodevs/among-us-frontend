@@ -44,12 +44,16 @@ export class StationRenderer {
   private overview: HTMLCanvasElement | null = null;
   private chunks = new Map<string, HTMLCanvasElement>();
   private visionKey = "";
+  private visionAnchor: Vector2 | null = null;
   private visionPoints: Vector2[] = [];
   private cameraPosition: Vector2 | null = null;
   private doorProgress = new Map<string, number>();
   private positions = new Map<string, Vector2>();
   clear() {
     this.overview = null;
+    this.visionKey = "";
+    this.visionAnchor = null;
+    this.visionPoints = [];
     this.chunks.clear();
     this.positions.clear();
     this.doorProgress.clear();
@@ -364,13 +368,19 @@ export class StationRenderer {
       ctx.beginPath();
       ctx.rect(view.x, view.y, view.width, view.height);
       const visionKey = [
-        own.x,
-        own.y,
         radius,
         ...(data.doors || []).filter((d) => d.closed).map((d) => d.id),
       ].join(",");
-      if (visionKey !== this.visionKey) {
+      const visionMoved = !this.visionAnchor ||
+        Math.hypot(
+          own.x - this.visionAnchor.x,
+          own.y - this.visionAnchor.y,
+        ) >= 12;
+      // Local prediction moves each animation frame; raycasting 180 rays
+      // for every pixel would erase the benefit on low-end devices.
+      if (visionKey !== this.visionKey || visionMoved) {
         this.visionKey = visionKey;
+        this.visionAnchor = { x: own.x, y: own.y };
         const points: Vector2[] = [];
         for (let i = 0; i < 180; i++) {
           const angle = (i * Math.PI * 2) / 180,
