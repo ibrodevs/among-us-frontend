@@ -114,12 +114,16 @@ export async function walk(c: Client, target: { x: number; y: number }) {
             : delta > 0
               ? "ArrowDown"
               : "ArrowUp";
+      const ackBefore = c.own!.last_move_seq;
       await c.page.keyboard.down(key);
       await sleep(
         Math.max(120, Math.min(900, ((Math.abs(delta) - 8) / 220) * 1000)),
       );
       await c.page.keyboard.up(key);
-      await sleep(350);
+      await expect
+        .poll(() => c.own!.last_move_seq, { timeout: 15000 })
+        .toBeGreaterThan(ackBefore);
+      await sleep(150);
       if (attempt === 34)
         throw new Error(
           `Walking did not settle at ${c.own!.x},${c.own!.y} toward ${p.x},${p.y}`,

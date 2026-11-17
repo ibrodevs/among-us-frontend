@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { station } from "../engine/asterion-renderer";
 import type { OwnState, Snapshot, Command } from "../network/types";
 import css from "./asterion.module.css";
@@ -9,17 +9,28 @@ export function StationMap({
   onClose,
   send,
   tactical = false,
-  serverNow=Date.now(),
+  serverNow = Date.now(),
 }: {
   snapshot: Snapshot;
   own: OwnState;
   onClose: () => void;
   send: (c: Command) => boolean;
   tactical?: boolean;
-  serverNow?:number;
+  serverNow?: number;
 }) {
-  const cooldown=Math.max(0,Math.ceil((Date.parse(own.sabotage_available_at||" ")-serverNow)/1000))||0;
-  const unavailable=cooldown>0||own.is_in_vent||(!own.alive&&!snapshot.settings?.ghost_sabotage);
+  const cooldown =
+    Math.max(
+      0,
+      Math.ceil(
+        (Date.parse(own.sabotage_available_at || " ") - serverNow) / 1000,
+      ),
+    ) || 0;
+  const unavailable =
+    cooldown > 0 ||
+    own.is_in_vent ||
+    (!own.alive && !snapshot.settings?.ghost_sabotage);
+  const [pan, setPan] = useState({ x: 0, y: 0, scale: 1 });
+  const drag = useRef<{ x: number; y: number } | null>(null);
   const [sector, setSector] = useState("all");
   const [roomId, setRoomId] = useState("");
   const area =
@@ -40,6 +51,8 @@ export function StationMap({
   const view = focused
     ? `${focused.bounds.x - 80} ${focused.bounds.y - 80} ${focused.bounds.width + 160} ${focused.bounds.height + 160}`
     : `${area.x - 80} ${area.y - 80} ${sector === "all" ? 6304 : area.width - area.x + 160} ${sector === "all" ? 4256 : area.height - area.y + 160}`;
+  const [vx, vy, vw, vh] = view.split(" ").map(Number);
+  const zoomView = `${vx + (vw * (1 - 1 / pan.scale)) / 2 + pan.x} ${vy + (vh * (1 - 1 / pan.scale)) / 2 + pan.y} ${vw / pan.scale} ${vh / pan.scale}`;
   return (
     <div className="modal-backdrop">
       <section
@@ -63,6 +76,7 @@ export function StationMap({
             value={sector}
             onChange={(e) => {
               setSector(e.target.value);
+              setPan({ x: 0, y: 0, scale: 1 });
               setRoomId("");
             }}
           >
@@ -78,7 +92,10 @@ export function StationMap({
           <select
             aria-label="Помещение"
             value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
+            onChange={(e) => {
+              setRoomId(e.target.value);
+              setPan({ x: 0, y: 0, scale: 1 });
+            }}
           >
             <option value="">Обзор станции</option>
             {station.rooms.map((r) => (
@@ -95,9 +112,58 @@ export function StationMap({
             ))}
           </select>
         </label>
+        <div className="row" aria-label="Масштаб карты">
+          <button
+            className="action secondary"
+            aria-label="Приблизить карту"
+            onClick={() =>
+              setPan((p) => ({ ...p, scale: Math.min(5, p.scale * 1.4) }))
+            }
+          >
+            +
+          </button>
+          <button
+            className="action secondary"
+            aria-label="Отдалить карту"
+            onClick={() =>
+              setPan((p) => ({ ...p, scale: Math.max(1, p.scale / 1.4) }))
+            }
+          >
+            −
+          </button>
+          <button
+            className="action secondary"
+            onClick={() => setPan({ x: 0, y: 0, scale: 1 })}
+          >
+            Сбросить обзор
+          </button>
+        </div>
         <svg
+          style={{ touchAction: "none" }}
+          onPointerDown={(e) => {
+            drag.current = { x: e.clientX, y: e.clientY };
+            e.currentTarget.setPointerCapture(e.pointerId);
+          }}
+          onPointerMove={(e) => {
+            if (!drag.current) return;
+            const box = e.currentTarget.getBoundingClientRect(),
+              dx = e.clientX - drag.current.x,
+              dy = e.clientY - drag.current.y;
+            drag.current = { x: e.clientX, y: e.clientY };
+            setPan((p) => ({
+              ...p,
+              x: p.x - (dx * vw) / p.scale / box.width,
+              y: p.y - (dy * vh) / p.scale / box.height,
+            }));
+          }}
+          onPointerUp={() => {
+            drag.current = null;
+          }}
+          onPointerCancel={() => {
+            drag.current = null;
+          }}
           className={css.map}
-          viewBox={view}
+          viewBox={zoomView}
           role="img"
           aria-label="Карта комнат и собственных заданий"
         >
@@ -121,12 +187,16 @@ export function StationMap({
               opacity={snapshot.map_mode === "compact" && !r.compact ? 0.2 : 1}
             >
               <title>{r.name}</title>
-              <rect
-                {...r.bounds}
-                rx="35"
-                fill="#273e53"
-                stroke="#7ca0b4"
-                strokeWidth="8"
+              {r.floor_parts.map((p, i) => (
+                <rect key={i} {...p} fill={r.visual.ambientLight} />
+              ))}
+              <path
+                d={r.outline
+                  .map(([x, y, xx, yy]) => `M${x} ${y}L${xx} ${yy}`)
+                  .join(" ")}
+                fill="none"
+                stroke={r.visual.accentColor}
+                strokeWidth="9"
               />
               <text
                 x={r.bounds.x + r.bounds.width / 2}
@@ -185,14 +255,24 @@ export function StationMap({
           ● Вы · <span style={{ color: "#f1cf76" }}>● Ваши задания</span> ·{" "}
           <span style={{ color: "#ed687b" }}>● Авария / закрытая дверь</span>
         </p>
-        {tactical&&cooldown>0&&<p>Системы восстанавливаются · {cooldown} с</p>}
+        {tactical && cooldown > 0 && (
+          <p>Системы восстанавливаются · {cooldown} с</p>
+        )}
         {tactical && (
           <div className={css.grid}>
             {["lights", "reactor", "oxygen", "comms"].map((kind) => (
               <button
                 className="action"
                 key={kind}
-                disabled={unavailable||snapshot.sabotages?.some(s=>s.kind===kind||(["reactor","oxygen"].includes(kind)&&["reactor","oxygen"].includes(s.kind)))}
+                disabled={
+                  unavailable ||
+                  snapshot.sabotages?.some(
+                    (s) =>
+                      s.kind === kind ||
+                      (["reactor", "oxygen"].includes(kind) &&
+                        ["reactor", "oxygen"].includes(s.kind)),
+                  )
+                }
                 onClick={() => send({ type: "sabotage.start", kind })}
               >
                 {kind}
@@ -203,7 +283,10 @@ export function StationMap({
                 <button
                   key={group}
                   className="action secondary"
-                  disabled={unavailable||snapshot.sabotages?.some(s=>s.kind==="doors")}
+                  disabled={
+                    unavailable ||
+                    snapshot.sabotages?.some((s) => s.kind === "doors")
+                  }
                   onClick={() =>
                     send({ type: "sabotage.start", kind: "doors", group })
                   }

@@ -38,6 +38,7 @@ jobs:
       DJANGO_SECRET_KEY: ci-only-never-use-in-production
       DATABASE_URL: postgres://crew:crew_ci_only@127.0.0.1:5432/crew_e2e
       REDIS_URL: redis://127.0.0.1:6379/0
+      MAP_REVIEW_ENABLED: "true"
       CREW_UI_FIXTURES: "true"
       CREW_BACKEND_PYTHON: python
     steps:
@@ -45,7 +46,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ibrodevs/among-us-backend
-          ref: ai/backend-v2
+          ref: ai/backend-map-redesign
           path: backend
       - uses: actions/setup-python@v5
         with:
@@ -78,3 +79,4 @@ jobs:
           path: |
             test-results/*.png
             test-results/*.json
+            test-results/map-redesign/

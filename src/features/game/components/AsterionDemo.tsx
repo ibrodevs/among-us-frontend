@@ -1,4 +1,5 @@
 "use client";
+import {useRoomAmbience} from "../../audio/useRoomAmbience";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { station } from "../engine/asterion-renderer";
@@ -20,7 +21,7 @@ const geometry: MapConfig = {
 };
 export function AsterionDemo() {
   const [map, setMap] = useState(false),
-    [position, setPosition] = useState({ x: 2930, y: 1970 }),
+    [position, setPosition] = useState(station.spawns[0]),
     pos = useRef(position),
     close = useCallback(() => setMap(false), []),
     input = useGameInput(map, close);
@@ -91,6 +92,7 @@ export function AsterionDemo() {
     tasks: [],
     ...position,
   };
+  useRoomAmbience(position.x,position.y,true);
   return (
     <main className={css.screen}>
       <header className="row">

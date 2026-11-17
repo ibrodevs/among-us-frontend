@@ -34,6 +34,105 @@ export type MusicMood =
   | "victory"
   | "defeat";
 export class AudioManager {
+  private zoneProfile = "";
+  private zone: {
+    osc: OscillatorNode;
+    gain: GainNode;
+    noise: AudioBufferSourceNode;
+    filter: BiquadFilterNode;
+    noiseGain: GainNode;
+  } | null = null;
+  setZone(profile: string) {
+    this.zoneProfile = profile;
+    const c = this.context;
+    if (!c || !this.master) return;
+    if (!this.zone) {
+      const osc = c.createOscillator(),
+        gain = c.createGain();
+      gain.gain.value = 0;
+      osc.connect(gain);
+      gain.connect(this.master);
+      osc.start();
+      const noise = c.createBufferSource(),
+        filter = c.createBiquadFilter(),
+        noiseGain = c.createGain();
+      const buffer = c.createBuffer(1, c.sampleRate * 2, c.sampleRate),
+        samples = buffer.getChannelData(0);
+      for (let i = 0; i < samples.length; i++)
+        samples[i] = (Math.random() * 2 - 1) * 0.3;
+      noise.buffer = buffer;
+      noise.loop = true;
+      filter.type = "bandpass";
+      filter.Q.value = 0.7;
+      noiseGain.gain.value = 0;
+      noise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(this.master);
+      noise.start();
+      this.zone = { osc, gain, noise, filter, noiseGain };
+    }
+    const profiles = [
+      "core",
+      "electric",
+      "turbine",
+      "water",
+      "workshop",
+      "command",
+      "compute",
+      "radio",
+      "surveillance",
+      "space",
+      "medical",
+      "laboratory",
+      "garden",
+      "compressor",
+      "home",
+      "cargo",
+      "ventilation",
+      "servers",
+      "transit",
+      "pressure",
+      "nexus",
+    ];
+    const index = profiles.indexOf(profile),
+      at = c.currentTime;
+    this.zone.osc.type = ["core", "turbine", "compressor", "pressure"].includes(
+      profile,
+    )
+      ? "triangle"
+      : "sine";
+    this.zone.filter.frequency.setTargetAtTime(
+      ["radio", "surveillance"].includes(profile)
+        ? 1400
+        : ["water", "garden", "servers", "ventilation"].includes(profile)
+          ? 540
+          : 180,
+      at,
+      0.8,
+    );
+    this.zone.noiseGain.gain.setTargetAtTime(
+      index < 0
+        ? 0
+        : this.preferences.music *
+            (["radio", "water", "garden", "servers", "ventilation"].includes(
+              profile,
+            )
+              ? 0.12
+              : 0.025),
+      at,
+      0.9,
+    );
+    this.zone.osc.frequency.setTargetAtTime(
+      38 + Math.max(0, index) * 4.3,
+      at,
+      0.8,
+    );
+    this.zone.gain.gain.setTargetAtTime(
+      index < 0 ? 0 : this.preferences.music * 0.035,
+      at,
+      0.7,
+    );
+  }
   private mood: MusicMood = "menu";
   setMood(mood: MusicMood) {
     this.mood = mood;
@@ -68,6 +167,7 @@ export class AudioManager {
       this.master = this.context.createGain();
       this.master.connect(this.context.destination);
       this.apply();
+      this.setZone(this.zoneProfile);
       this.musicTimer = setInterval(() => this.ambient(), 4000);
     }
     if (this.context.state === "suspended") await this.context.resume();
@@ -80,6 +180,7 @@ export class AudioManager {
     this.apply();
   }
   private apply() {
+    if (this.zone) this.setZone(this.zoneProfile);
     if (this.context && this.master)
       this.master.gain.setTargetAtTime(
         this.preferences.muted ? 0 : this.preferences.master,
@@ -200,6 +301,16 @@ export class AudioManager {
     void this.context?.suspend();
   }
   close() {
+    if (this.zone) {
+      this.zone.osc.stop();
+      this.zone.osc.disconnect();
+      this.zone.gain.disconnect();
+      this.zone.noise.stop();
+      this.zone.noise.disconnect();
+      this.zone.filter.disconnect();
+      this.zone.noiseGain.disconnect();
+      this.zone = null;
+    }
     if (this.musicTimer) clearInterval(this.musicTimer);
     this.musicTimer = null;
     for (const n of this.active) {

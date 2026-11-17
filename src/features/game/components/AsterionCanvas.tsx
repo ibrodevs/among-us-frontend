@@ -1,21 +1,33 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { StationRenderer } from "../engine/asterion-renderer";
-import type { Snapshot } from "../network/types";
+import type { Snapshot, Task } from "../network/types";
 import styles from "../game.module.css";
 export function AsterionCanvas({
   snapshot,
   playerId,
   camera,
+  tasks,
 }: {
   snapshot: Snapshot;
   playerId: string;
-  camera?:{x:number;y:number;radius:number};
+  tasks?: Task[];
+  camera?: {
+    x: number;
+    y: number;
+    radius: number;
+    zoom?: number;
+    review?: boolean;
+    freeze?: boolean;
+  };
 }) {
   const canvas = useRef<HTMLCanvasElement>(null),
     latest = useRef(snapshot);
   latest.current = snapshot;
-  const cameraRef=useRef(camera);cameraRef.current=camera;
+  const taskRef = useRef(tasks);
+  taskRef.current = tasks;
+  const cameraRef = useRef(camera);
+  cameraRef.current = camera;
   useEffect(() => {
     const surface = canvas.current,
       ctx = surface?.getContext("2d");
@@ -53,6 +65,7 @@ export function AsterionCanvas({
         Date.now(),
         dt,
         cameraRef.current,
+        taskRef.current,
       );
       if (samples.length >= 120) {
         surface!.dataset.fps = (

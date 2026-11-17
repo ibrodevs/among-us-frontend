@@ -308,7 +308,7 @@ export function AsterionScreen({
             </span>
           </div>
           <div className={css.viewport}>
-            <AsterionCanvas snapshot={snapshot} playerId={playerId} />
+            <AsterionCanvas snapshot={snapshot} playerId={playerId} tasks={own.tasks} />
           </div>
           <GameControls
             analog

@@ -1,4 +1,5 @@
 "use client";
+import { useRoomAmbience } from "./useRoomAmbience";
 import { useAudio } from "./AudioProvider";
 import { useEffect, useRef } from "react";
 import { StationAudio, type SoundName } from "./AudioManager";
@@ -10,6 +11,7 @@ export function EventSoundBridge({
   snapshot: Snapshot;
   own: OwnState;
 }) {
+  useRoomAmbience(own.x,own.y,snapshot.phase === "playing");
   const started = useRef(false),
     ejected = useRef<string | null>(null);
   const audio = useRef<StationAudio | null>(null),
