@@ -1,6 +1,10 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { StationRenderer } from "../engine/asterion-renderer";
+import type { RefObject } from "react";
+import { StationRenderer, station } from "../engine/asterion-renderer";
+import { LocalMotionPredictor } from "../engine/local-prediction";
+import { readDirection } from "../engine/input";
+import type { InputState } from "../engine/input";
 import type { Snapshot, Task } from "../network/types";
 import styles from "../game.module.css";
 export function AsterionCanvas({
@@ -8,10 +12,14 @@ export function AsterionCanvas({
   playerId,
   camera,
   tasks,
+  input,
+  active = false,
 }: {
   snapshot: Snapshot;
   playerId: string;
   tasks?: Task[];
+  input?: RefObject<InputState>;
+  active?: boolean;
   camera?: {
     x: number;
     y: number;
@@ -28,11 +36,16 @@ export function AsterionCanvas({
   taskRef.current = tasks;
   const cameraRef = useRef(camera);
   cameraRef.current = camera;
+  const inputRef = useRef(input);
+  inputRef.current = input;
+  const activeRef = useRef(active);
+  activeRef.current = active;
   useEffect(() => {
     const surface = canvas.current,
       ctx = surface?.getContext("2d");
     if (!surface || !ctx) return;
     const renderer = new StationRenderer();
+    const predictor = new LocalMotionPredictor();
     let width = 1,
       height = 1,
       dpr = 1,
@@ -56,9 +69,29 @@ export function AsterionCanvas({
       previous = time;
       ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx!.clearRect(0, 0, width, height);
+      const state = latest.current;
+      const own = state.players.find((p) => p.id === playerId);
+      let predicted = null;
+      if (own && state.phase === "playing" && activeRef.current &&
+          inputRef.current && !cameraRef.current) {
+        predictor.sync({ x: own.x, y: own.y }, state.state_version, state.game_id);
+        const rawSpeed = state.settings?.speed;
+        const speed = typeof rawSpeed === "number" && Number.isFinite(rawSpeed)
+          ? rawSpeed : station.speed;
+        predicted = predictor.advance(
+          readDirection(inputRef.current.current),
+          dt,
+          station,
+          state.doors?.filter((d) => d.closed).map((d) => d.bounds) || [],
+          speed,
+          !own.alive,
+        );
+      } else {
+        predictor.reset();
+      }
       const stats = renderer.draw(
         ctx!,
-        latest.current,
+        state,
         playerId,
         width,
         height,
@@ -66,6 +99,7 @@ export function AsterionCanvas({
         dt,
         cameraRef.current,
         taskRef.current,
+        predicted,
       );
       if (samples.length >= 120) {
         surface!.dataset.fps = (
@@ -82,6 +116,7 @@ export function AsterionCanvas({
       cancelAnimationFrame(frame);
       observer.disconnect();
       renderer.clear();
+      predictor.reset();
     };
   }, [playerId]);
   return (

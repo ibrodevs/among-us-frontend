@@ -44,12 +44,16 @@ export class StationRenderer {
   private overview: HTMLCanvasElement | null = null;
   private chunks = new Map<string, HTMLCanvasElement>();
   private visionKey = "";
+  private visionAnchor: Vector2 | null = null;
   private visionPoints: Vector2[] = [];
   private cameraPosition: Vector2 | null = null;
   private doorProgress = new Map<string, number>();
   private positions = new Map<string, Vector2>();
   clear() {
     this.overview = null;
+    this.visionKey = "";
+    this.visionAnchor = null;
+    this.visionPoints = [];
     this.chunks.clear();
     this.positions.clear();
     this.doorProgress.clear();
@@ -106,11 +110,15 @@ export class StationRenderer {
       freeze?: boolean;
     },
     ownTasks?: Task[],
+    predictedOwn?: Vector2 | null,
   ) {
     if (cameraView?.freeze) time = 1000;
-    const own = cameraView
+    const serverOwn = cameraView
       ? { id: "camera-monitor", x: cameraView.x, y: cameraView.y, alive: true }
       : data.players.find((p) => p.id === playerId);
+    const own = serverOwn && predictedOwn && !cameraView
+      ? { ...serverOwn, x: predictedOwn.x, y: predictedOwn.y }
+      : serverOwn;
     if (!own) return;
     const camera = this.cameraPosition || { x: own.x, y: own.y };
     const blend = Math.min(1, dt * 14);
@@ -305,10 +313,13 @@ export class StationRenderer {
       if (!ids.has(id)) this.positions.delete(id);
     for (const p of data.players) {
       if (p.in_vent) continue;
+      const local = p.id === playerId && predictedOwn && !cameraView;
+      const target = local ? predictedOwn : p;
       let pos = this.positions.get(p.id) || { x: p.x, y: p.y };
-      const dx = p.x - pos.x,
-        dy = p.y - pos.y,
-        blend = Math.hypot(dx, dy) > 150 ? 1 : Math.min(1, dt * 18);
+      const dx = target.x - pos.x,
+        dy = target.y - pos.y,
+        blend = local || Math.hypot(dx, dy) > 150
+          ? 1 : Math.min(1, dt * 18);
       pos = { x: pos.x + dx * blend, y: pos.y + dy * blend };
       this.positions.set(p.id, pos);
       ctx.save();
@@ -357,13 +368,19 @@ export class StationRenderer {
       ctx.beginPath();
       ctx.rect(view.x, view.y, view.width, view.height);
       const visionKey = [
-        own.x,
-        own.y,
         radius,
         ...(data.doors || []).filter((d) => d.closed).map((d) => d.id),
       ].join(",");
-      if (visionKey !== this.visionKey) {
+      const visionMoved = !this.visionAnchor ||
+        Math.hypot(
+          own.x - this.visionAnchor.x,
+          own.y - this.visionAnchor.y,
+        ) >= 12;
+      // Local prediction moves each animation frame; raycasting 180 rays
+      // for every pixel would erase the benefit on low-end devices.
+      if (visionKey !== this.visionKey || visionMoved) {
         this.visionKey = visionKey;
+        this.visionAnchor = { x: own.x, y: own.y };
         const points: Vector2[] = [];
         for (let i = 0; i < 180; i++) {
           const angle = (i * Math.PI * 2) / 180,
