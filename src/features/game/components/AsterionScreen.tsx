@@ -72,7 +72,7 @@ export function AsterionScreen({
   const input = useGameInput(paused, close),
     seq = useRef(Date.now());
   useEffect(() => {
-    const id = setInterval(() => setClock(Date.now()), 100);
+    const id = setInterval(() => setClock(Date.now()), 250);
     const key = (e: KeyboardEvent) => {
       if (
         e.code === "KeyM" &&
@@ -335,6 +335,8 @@ export function AsterionScreen({
               snapshot={snapshot}
               playerId={playerId}
               tasks={own.tasks}
+              input={input}
+              active={!paused}
             />
           </div>
           <GameControls
