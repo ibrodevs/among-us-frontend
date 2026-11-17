@@ -354,7 +354,7 @@ function bot(c, elapsed) {
         p.alive &&
         near(o, p) < 85 &&
         clients.some(
-          (q) => q.own.role === "crew" && q.g.nickname === p.nickname,
+          (q) => q.own?.role === "crew" && q.g.nickname === p.nickname,
         ),
     );
     if (
