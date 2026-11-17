@@ -259,7 +259,7 @@ export function AsterionScreen({
       <header className="row">
         <div>
           <p className="eyebrow">
-            CREW MISSION · {code} ·{" "}
+            CREWMATE X · {code} ·{" "}
             {snapshot.map_mode === "compact"
               ? "КОМПАКТНАЯ СТАНЦИЯ"
               : "ПОЛНАЯ СТАНЦИЯ"}
