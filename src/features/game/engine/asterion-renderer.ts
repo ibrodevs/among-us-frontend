@@ -106,11 +106,15 @@ export class StationRenderer {
       freeze?: boolean;
     },
     ownTasks?: Task[],
+    predictedOwn?: Vector2 | null,
   ) {
     if (cameraView?.freeze) time = 1000;
-    const own = cameraView
+    const serverOwn = cameraView
       ? { id: "camera-monitor", x: cameraView.x, y: cameraView.y, alive: true }
       : data.players.find((p) => p.id === playerId);
+    const own = serverOwn && predictedOwn && !cameraView
+      ? { ...serverOwn, x: predictedOwn.x, y: predictedOwn.y }
+      : serverOwn;
     if (!own) return;
     const camera = this.cameraPosition || { x: own.x, y: own.y };
     const blend = Math.min(1, dt * 14);
@@ -305,10 +309,13 @@ export class StationRenderer {
       if (!ids.has(id)) this.positions.delete(id);
     for (const p of data.players) {
       if (p.in_vent) continue;
+      const local = p.id === playerId && predictedOwn && !cameraView;
+      const target = local ? predictedOwn : p;
       let pos = this.positions.get(p.id) || { x: p.x, y: p.y };
-      const dx = p.x - pos.x,
-        dy = p.y - pos.y,
-        blend = Math.hypot(dx, dy) > 150 ? 1 : Math.min(1, dt * 18);
+      const dx = target.x - pos.x,
+        dy = target.y - pos.y,
+        blend = local || Math.hypot(dx, dy) > 150
+          ? 1 : Math.min(1, dt * 18);
       pos = { x: pos.x + dx * blend, y: pos.y + dy * blend };
       this.positions.set(p.id, pos);
       ctx.save();
