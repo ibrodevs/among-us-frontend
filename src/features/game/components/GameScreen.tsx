@@ -29,7 +29,7 @@ export function GameScreen({ code }: { code: string }) {
       <header className={styles.header}>
         <div className={styles.brand}>
           <span className={styles.logo}><Icon name="station" width="28" height="28" /></span>
-          <div><p className={styles.eyebrow}>Crew Mission</p><h1>Орбитальная станция</h1></div>
+          <div><p className={styles.eyebrow}>CREWMATE X</p><h1>Орбитальная станция</h1></div>
         </div>
         <div className={styles.headerActions}>
           <span className={styles.room} title={code}>Код <strong>{code}</strong></span>

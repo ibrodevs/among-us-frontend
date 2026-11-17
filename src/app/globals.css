@@ -360,3 +360,4 @@ footer {
     padding: 18px;
   }
 }
+.lobby-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px}.lobby-card{display:flex;align-items:center;gap:12px;min-width:0;padding:12px}.lobby-card strong{overflow-wrap:anywhere}.lobby-card svg{flex-shrink:0}.lobby-card p{font-size:12px}

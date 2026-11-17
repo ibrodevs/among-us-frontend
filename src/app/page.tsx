@@ -44,9 +44,9 @@ export default function HomePage() {
     <>
       <nav className="nav">
         <Link className="wordmark" href="/">
-          ✦ CREW <span>MISSION</span>
+          ✦ CREWMATE <span>X</span>
         </Link>
-        <span className="badge">4–10 друзей · 1 миссия</span>
+        <span className="badge">4–20 друзей · 1 миссия</span>
       </nav>
       <main>
         <section className="hero">
@@ -121,12 +121,17 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+        <p style={{ textAlign: "center" }}>
+          <Link className="action secondary" href="/demo/asterion">
+            Исследовать Asterion · демо карты
+          </Link>
+        </p>
         <div className="facts">
           <div>
-            <strong>4–10</strong>игроков в экипаже
+            <strong>4–20</strong>игроков в экипаже
           </div>
           <div>
-            <strong>3 задания</strong>на каждого исследователя
+            <strong>7 заданий</strong>на каждого исследователя
           </div>
           <div>
             <strong>1 вопрос</strong>кому ты доверяешь?
@@ -155,7 +160,7 @@ export default function HomePage() {
           </article>
         </section>
       </main>
-      <footer>CREW MISSION · Оригинальное космическое приключение</footer>
+      <footer>CREWMATE X · Оригинальное космическое приключение</footer>
     </>
   );
 }

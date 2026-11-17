@@ -38,12 +38,15 @@ jobs:
       DJANGO_SECRET_KEY: ci-only-never-use-in-production
       DATABASE_URL: postgres://crew:crew_ci_only@127.0.0.1:5432/crew_e2e
       REDIS_URL: redis://127.0.0.1:6379/0
+      MAP_REVIEW_ENABLED: "true"
+      CREW_UI_FIXTURES: "true"
+      CREW_BACKEND_PYTHON: python
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
           repository: ibrodevs/among-us-backend
-          ref: ai/backend-gameplay
+          ref: main
           path: backend
       - uses: actions/setup-python@v5
         with:
@@ -54,8 +57,9 @@ jobs:
           cache: npm
       - run: pip install -r backend/requirements.lock.txt
       - run: cmp src/features/game/engine/map.json backend/game/map.json
+      - run: cmp src/features/game/engine/asterion.json backend/game/maps/asterion.json
       - run: npm ci --no-fund
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - run: npm run build
       - name: Start real stack and test complete matches
         run: |
@@ -74,4 +78,5 @@ jobs:
           name: verified-match-screens
           path: |
             test-results/*.png
-            test-results/match-*.json
+            test-results/*.json
+            test-results/map-redesign/

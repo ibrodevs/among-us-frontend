@@ -1,0 +1,55 @@
+{
+  "environment": "Playwright Chromium headless on development Mac, emulated mobile viewport and CPU throttle; not a physical-device benchmark",
+  "results": [
+    {
+      "name": "desktop",
+      "width": 1440,
+      "cpuThrottle": 1,
+      "samples": [
+        {
+          "fps": 56.7,
+          "chunks": 8
+        },
+        {
+          "fps": 60,
+          "chunks": 8
+        },
+        {
+          "fps": 60,
+          "chunks": 8
+        },
+        {
+          "fps": 60,
+          "chunks": 8
+        }
+      ],
+      "initialHeapBytes": 3241420,
+      "finalHeapBytes": 4605328
+    },
+    {
+      "name": "mobile-cpu4",
+      "width": 390,
+      "cpuThrottle": 4,
+      "samples": [
+        {
+          "fps": 60,
+          "chunks": 6
+        },
+        {
+          "fps": 60,
+          "chunks": 9
+        },
+        {
+          "fps": 60,
+          "chunks": 9
+        },
+        {
+          "fps": 60,
+          "chunks": 9
+        }
+      ],
+      "initialHeapBytes": 3190936,
+      "finalHeapBytes": 4622464
+    }
+  ]
+}

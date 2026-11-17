@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { Task } from "../network/types";
-const names = {
+const names: Record<string,string> = {
   wires: "Wire Link · Соедини разъёмы",
   sequence: "Sequence · Повтори сигнал",
   upload: "Upload · Загрузка данных",

@@ -10,12 +10,14 @@ export interface RoomPlayer {
   nickname: string;
   is_host: boolean;
   is_connected: boolean;
+  color?: number|null;
 }
 export interface Room {
   id: string;
   code: string;
   status: RoomStatus;
   min_players: number;
+  settings?: Record<string,number|string|boolean>;
   max_players: number;
   host_player_id: string;
   players: RoomPlayer[];

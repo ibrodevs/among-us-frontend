@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LiveGameScreen } from "@/features/game/components/LiveGameScreen";
 
 export const metadata: Metadata = {
-  title: "Орбитальная станция · Crew Mission",
+  title: "Орбитальная станция · CREWMATE X",
   icons: { icon: "/game/station.svg" },
 };
 

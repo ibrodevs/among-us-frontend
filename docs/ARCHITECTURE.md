@@ -3,7 +3,7 @@
 The team is implementing an original 2D multiplayer social-deduction experience inspired by the genre; **do not copy official characters, textures, sounds or names into the UI**.
 
 ## MVP
-- 4–10 players per private room, 6-character uppercase room code, guest nickname (2–16 characters).
+- 4–20 players per private room, 6-character uppercase room code, guest nickname (2–16 characters).
 - Host creates the room, players join by code, host starts at 4+ players.
 - One 2D spaceship map; player motion via WASD/arrows, no collision cheating.
 - Crew members complete 3 short tasks each; impostor(s) sabotage by eliminating crew, kill cooldown 25s.

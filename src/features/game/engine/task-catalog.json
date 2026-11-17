@@ -1,0 +1,142 @@
+{
+  "wires": {
+    "id": "wires",
+    "title": "Connect Wires",
+    "category": "common",
+    "seconds": 3,
+    "stages": 1
+  },
+  "power_routing": {
+    "id": "power_routing",
+    "title": "Power Routing",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "upload": {
+    "id": "upload",
+    "title": "Data Transfer",
+    "category": "long",
+    "seconds": 8,
+    "stages": 2
+  },
+  "engine_calibration": {
+    "id": "engine_calibration",
+    "title": "Engine Calibration",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "oxygen_filters": {
+    "id": "oxygen_filters",
+    "title": "Oxygen Filters",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "fuel_distribution": {
+    "id": "fuel_distribution",
+    "title": "Fuel Distribution",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "shield_alignment": {
+    "id": "shield_alignment",
+    "title": "Shield Alignment",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "medical_scan": {
+    "id": "medical_scan",
+    "title": "Medical Scan",
+    "category": "long",
+    "seconds": 8,
+    "stages": 1
+  },
+  "sample_analysis": {
+    "id": "sample_analysis",
+    "title": "Sample Analysis",
+    "category": "long",
+    "seconds": 8,
+    "stages": 2
+  },
+  "cargo_sorting": {
+    "id": "cargo_sorting",
+    "title": "Cargo Sorting",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "antenna_alignment": {
+    "id": "antenna_alignment",
+    "title": "Antenna Alignment",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "signal_frequency": {
+    "id": "signal_frequency",
+    "title": "Signal Frequency",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "navigation_route": {
+    "id": "navigation_route",
+    "title": "Navigation Route",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "asteroid_defense": {
+    "id": "asteroid_defense",
+    "title": "Asteroid Defense",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "debris_removal": {
+    "id": "debris_removal",
+    "title": "Debris Removal",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "thermal_balance": {
+    "id": "thermal_balance",
+    "title": "Thermal Balance",
+    "category": "long",
+    "seconds": 8,
+    "stages": 1
+  },
+  "coolant_valves": {
+    "id": "coolant_valves",
+    "title": "Coolant Valves",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "access_terminal": {
+    "id": "access_terminal",
+    "title": "Access Terminal",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "sequence": {
+    "id": "sequence",
+    "title": "Memory Matrix",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  },
+  "pressure_control": {
+    "id": "pressure_control",
+    "title": "Pressure Control",
+    "category": "short",
+    "seconds": 3,
+    "stages": 1
+  }
+}

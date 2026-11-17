@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { Room } from "@/lib/types";
 import { WS_BASE } from "@/lib/config";
 import { readGuest } from "@/lib/guest";
 import { acceptSnapshot } from "../network/types";
@@ -13,6 +14,7 @@ import type {
 export function useRoomSocket(code: string) {
   const socket = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<ConnectionStatus>("connecting");
+  const [room, setRoom] = useState<Room | null>(null);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [own, setOwn] = useState<OwnState | null>(null);
   const [playerId, setPlayerId] = useState("");
@@ -39,7 +41,13 @@ export function useRoomSocket(code: string) {
       );
       socket.current = ws;
       ws.onopen = () =>
-        ws.send(JSON.stringify({ type: "auth", token: guest!.token }));
+        ws.send(
+          JSON.stringify({
+            type: "auth",
+            token: guest!.token,
+            protocol_version: 2,
+          }),
+        );
       ws.onmessage = (event) => {
         if (disposed) return;
         lastMessage = Date.now();
@@ -65,15 +73,17 @@ export function useRoomSocket(code: string) {
               ws.send(JSON.stringify({ type: "ping" }));
             }
           }, 15000);
+        } else if (message.type === "room.snapshot") {
+          setRoom(message.room);
         } else if (
           message.type === "game.snapshot" &&
-          message.protocol_version === 1
+          [1, 2].includes(message.protocol_version)
         ) {
           serverOffset.current = Date.parse(message.server_time) - Date.now();
           setSnapshot((previous) => acceptSnapshot(previous, message));
         } else if (
           message.type === "game.self" &&
-          message.protocol_version === 1
+          [1, 2].includes(message.protocol_version)
         ) {
           setOwn((previous) =>
             !previous ||
@@ -132,5 +142,15 @@ export function useRoomSocket(code: string) {
     }
     return false;
   }, []);
-  return { status, snapshot, own, playerId, error, ping, send, serverOffset };
+  return {
+    room,
+    status,
+    snapshot,
+    own,
+    playerId,
+    error,
+    ping,
+    send,
+    serverOffset,
+  };
 }
