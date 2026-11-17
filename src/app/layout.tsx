@@ -7,7 +7,7 @@ import "@fontsource/nunito/latin-900.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Crew Mission",
+  title: "CREWMATE X",
   description: "A multiplayer social-deduction space game",
 };
 

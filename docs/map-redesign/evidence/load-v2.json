@@ -1,0 +1,287 @@
+{
+  "environment": "Local development Mac, real PostgreSQL/Redis/Daphne/durable clock, raw WebSocket clients; ps CPU is process-lifetime percentage, not an instantaneous profiler",
+  "rooms": 3,
+  "clients": 30,
+  "durationMs": 3621190,
+  "sent": 53785,
+  "configuredCommandsPerSecond": 300,
+  "p50Ms": 52413,
+  "p95Ms": 2996081,
+  "snapshots": [
+    30,
+    30,
+    30,
+    30,
+    29,
+    30,
+    29,
+    30,
+    30,
+    29,
+    46,
+    44,
+    44,
+    44,
+    44,
+    43,
+    43,
+    43,
+    43,
+    43,
+    54,
+    48,
+    50,
+    48,
+    50,
+    49,
+    49,
+    47,
+    47,
+    47
+  ],
+  "errors": [],
+  "restart": {
+    "oldPid": 66916,
+    "newPid": 67783,
+    "gapMs": 3500
+  },
+  "samples": [
+    {
+      "elapsedMs": 282,
+      "processes": [
+        {
+          "rssKb": 62448,
+          "cpuPercent": 51.8,
+          "kind": "api"
+        },
+        {
+          "rssKb": 32272,
+          "cpuPercent": 8.1,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 1.3360419999953592
+    },
+    {
+      "elapsedMs": 15527,
+      "processes": [
+        {
+          "rssKb": 87728,
+          "cpuPercent": 49.2,
+          "kind": "api"
+        },
+        {
+          "rssKb": 59760,
+          "cpuPercent": 54.3,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 0.7097080000094138
+    },
+    {
+      "elapsedMs": 31012,
+      "processes": [
+        {
+          "rssKb": 53760,
+          "cpuPercent": 38.3,
+          "kind": "api"
+        },
+        {
+          "rssKb": 46912,
+          "cpuPercent": 47.7,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 1.541957999987062
+    },
+    {
+      "elapsedMs": 2044987,
+      "processes": [
+        {
+          "rssKb": 86368,
+          "cpuPercent": 34.7,
+          "kind": "api"
+        },
+        {
+          "rssKb": 46736,
+          "cpuPercent": 30.3,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 4.29970799991861
+    },
+    {
+      "elapsedMs": 3495061,
+      "processes": [
+        {
+          "rssKb": 86624,
+          "cpuPercent": 72.1,
+          "kind": "api"
+        },
+        {
+          "rssKb": 43408,
+          "cpuPercent": 25.2,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 4.464291999582201
+    },
+    {
+      "elapsedMs": 3510594,
+      "processes": [
+        {
+          "rssKb": 51856,
+          "cpuPercent": 52.3,
+          "kind": "api"
+        },
+        {
+          "rssKb": 44624,
+          "cpuPercent": 52.5,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 4.17200000025332
+    },
+    {
+      "elapsedMs": 3525805,
+      "processes": [
+        {
+          "rssKb": 86944,
+          "cpuPercent": 49.4,
+          "kind": "api"
+        },
+        {
+          "rssKb": 48240,
+          "cpuPercent": 45.9,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 0.9453340000472963
+    },
+    {
+      "elapsedMs": 3541024,
+      "processes": [
+        {
+          "rssKb": 87424,
+          "cpuPercent": 56.1,
+          "kind": "api"
+        },
+        {
+          "rssKb": 48016,
+          "cpuPercent": 46.5,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 0.6664999998174608
+    },
+    {
+      "elapsedMs": 3556257,
+      "processes": [
+        {
+          "rssKb": 54832,
+          "cpuPercent": 51.4,
+          "kind": "api"
+        },
+        {
+          "rssKb": 46496,
+          "cpuPercent": 47.3,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 1.3249579998664558
+    },
+    {
+      "elapsedMs": 3574964,
+      "processes": [
+        {
+          "rssKb": 55424,
+          "cpuPercent": 58.1,
+          "kind": "api"
+        },
+        {
+          "rssKb": 88528,
+          "cpuPercent": 47.5,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 1.1876249997876585
+    },
+    {
+      "elapsedMs": 3590205,
+      "processes": [
+        {
+          "rssKb": 88576,
+          "cpuPercent": 60.6,
+          "kind": "api"
+        },
+        {
+          "rssKb": 55952,
+          "cpuPercent": 49.9,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 0.8950829999521375
+    },
+    {
+      "elapsedMs": 3605454,
+      "processes": [
+        {
+          "rssKb": 89328,
+          "cpuPercent": 52.1,
+          "kind": "api"
+        },
+        {
+          "rssKb": 56032,
+          "cpuPercent": 48.5,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 0.5786250000819564
+    },
+    {
+      "elapsedMs": 3620686,
+      "processes": [
+        {
+          "rssKb": 57648,
+          "cpuPercent": 53,
+          "kind": "api"
+        },
+        {
+          "rssKb": 56096,
+          "cpuPercent": 46.6,
+          "kind": "clock"
+        }
+      ],
+      "postgresConnections": 7,
+      "redisPingMs": 1.004167000297457
+    }
+  ],
+  "final": [
+    {
+      "index": 0,
+      "phase": "playing"
+    },
+    {
+      "index": 1,
+      "phase": "playing"
+    },
+    {
+      "index": 2,
+      "phase": "playing"
+    }
+  ],
+  "acceptance_status": "INVALID_INTERRUPTED_RUN",
+  "limitation": "The session was interrupted/suspended: wall duration was 3621190 ms for a requested 180 s probe. Latencies and worker/deadline results are not valid acceptance evidence. Repeat without suspension."
+}

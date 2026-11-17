@@ -160,7 +160,7 @@ function LegacyGameScreen({
       <div className={styles.shell}>
         <header className={styles.header}>
           <div>
-            <p className="eyebrow">Crew Mission · {code}</p>
+            <p className="eyebrow">CREWMATE X · {code}</p>
             <h1>Станция «Орбита»</h1>
           </div>
           <div className={styles.headerActions}>

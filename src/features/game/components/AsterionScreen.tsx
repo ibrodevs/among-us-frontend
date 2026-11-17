@@ -259,7 +259,7 @@ export function AsterionScreen({
       <header className="row">
         <div>
           <p className="eyebrow">
-            CREW MISSION · {code} ·{" "}
+            CREWMATE X · {code} ·{" "}
             {snapshot.map_mode === "compact"
               ? "КОМПАКТНАЯ СТАНЦИЯ"
               : "ПОЛНАЯ СТАНЦИЯ"}
@@ -308,7 +308,7 @@ export function AsterionScreen({
             </span>
           </div>
           <div className={css.viewport}>
-            <AsterionCanvas snapshot={snapshot} playerId={playerId} />
+            <AsterionCanvas snapshot={snapshot} playerId={playerId} tasks={own.tasks} />
           </div>
           <GameControls
             analog

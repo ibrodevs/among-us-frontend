@@ -131,8 +131,8 @@ for (const count of [4, 10])
     const clients: Client[] = [];
     const started = Date.now();
     // Preserve the real 10/min guest throttle when the 4- and 10-player cases run together.
-    if (count === 10)
-      await new Promise((resolve) => setTimeout(resolve, 22000));
+    test.setTimeout(300000);
+    await new Promise((resolve) => setTimeout(resolve, 61000));
     try {
       for (let i = 0; i < count; i++) {
         const c = await connectPlayer(browser, i);
@@ -343,6 +343,8 @@ for (const count of [4, 10])
 test("all three real task dialogs, kill, report, skip vote and impostor victory", async ({
   browser,
 }) => {
+  test.setTimeout(300000);
+  await new Promise((resolve) => setTimeout(resolve, 61000));
   const clients: Client[] = [];
   try {
     for (let i = 0; i < 4; i++) {

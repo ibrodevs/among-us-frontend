@@ -44,7 +44,7 @@ export default function HomePage() {
     <>
       <nav className="nav">
         <Link className="wordmark" href="/">
-          ✦ CREW <span>MISSION</span>
+          ✦ CREWMATE <span>X</span>
         </Link>
         <span className="badge">4–10 друзей · 1 миссия</span>
       </nav>
@@ -160,7 +160,7 @@ export default function HomePage() {
           </article>
         </section>
       </main>
-      <footer>CREW MISSION · Оригинальное космическое приключение</footer>
+      <footer>CREWMATE X · Оригинальное космическое приключение</footer>
     </>
   );
 }

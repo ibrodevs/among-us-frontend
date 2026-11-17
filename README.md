@@ -1,4 +1,4 @@
-# Crew Mission — Frontend
+# CREWMATE X — Frontend
 
 Multiplayer 2D social-deduction game inspired by the genre of Among Us. Original artwork and UI only. Stack: **Next.js 15 App Router, React 19, TypeScript, Tailwind CSS 4**.
 
