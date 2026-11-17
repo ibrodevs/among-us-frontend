@@ -52,19 +52,9 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       unlock();
       audio.play("ui.click");
       const text = target.textContent || "";
-      if (text.includes("Отправить")) audio.play("chat.send");
-      if (text.includes("Пропустить")) audio.play("vote.cast");
-      if (text.includes("Использовать")) audio.play("task.begin");
       if (text.includes("Саботаж") || text.includes("Карта"))
         audio.play("ui.open");
       if (text.includes("Закрыть")) audio.play("ui.close");
-      if (text.includes("Ремонт")) audio.play("repair.begin");
-      if (text.includes("Сообщить")) audio.play("report");
-      if (
-        target.closest("[aria-labelledby=meeting-v2]") &&
-        !text.includes("Отправить")
-      )
-        audio.play("vote.cast");
     };
     let hoverAt = 0;
     const hover = (e: Event) => {
@@ -106,7 +96,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       engine.setMood("lobby");
       if (previousPath.current !== pathname) engine.play("room.create");
     } else if (!pathname.startsWith("/game/")) {
-      engine.setMood("menu");
+      engine.setMood(pathname.startsWith("/demo") ? "exploration" : "menu");
       if (previousPath.current !== pathname) engine.play("menu.return");
     }
     previousPath.current = pathname;

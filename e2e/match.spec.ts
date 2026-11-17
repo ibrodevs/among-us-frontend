@@ -361,6 +361,7 @@ test("all three real task dialogs, kill, report, skip vote and impostor victory"
     await expect(
       clients[0].page.getByRole("button", { name: "Начать игру" }),
     ).toBeEnabled();
+    await clients[0].page.getByLabel("Карта", { exact: true }).selectOption("1");
     await clients[0].page.getByRole("button", { name: "Начать игру" }).click();
     for (const c of clients)
       await expect

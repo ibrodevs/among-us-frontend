@@ -6,13 +6,16 @@ import styles from "../game.module.css";
 export function AsterionCanvas({
   snapshot,
   playerId,
+  camera,
 }: {
   snapshot: Snapshot;
   playerId: string;
+  camera?:{x:number;y:number;radius:number};
 }) {
   const canvas = useRef<HTMLCanvasElement>(null),
     latest = useRef(snapshot);
   latest.current = snapshot;
+  const cameraRef=useRef(camera);cameraRef.current=camera;
   useEffect(() => {
     const surface = canvas.current,
       ctx = surface?.getContext("2d");
@@ -49,6 +52,7 @@ export function AsterionCanvas({
         height,
         Date.now(),
         dt,
+        cameraRef.current,
       );
       if (samples.length >= 120) {
         surface!.dataset.fps = (
@@ -70,7 +74,7 @@ export function AsterionCanvas({
   return (
     <canvas
       ref={canvas}
-      className={styles.canvas}
+      className={styles.world}
       aria-label="ASTERION — игровая сцена"
     />
   );

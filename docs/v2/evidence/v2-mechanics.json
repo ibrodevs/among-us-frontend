@@ -1,0 +1,17 @@
+{
+  "scenario": "no database fixtures or mocked requests",
+  "code": "EJ3YMU",
+  "passed": [
+    "vent graph and hidden travel",
+    "offline and reload in vent",
+    "lights repair",
+    "two-player reactor hold",
+    "10-second door collision",
+    "kill cooldown UI",
+    "ghost task",
+    "report",
+    "ghost chat isolation",
+    "Skip",
+    "parity"
+  ]
+}

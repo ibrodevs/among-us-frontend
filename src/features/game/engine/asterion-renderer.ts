@@ -289,8 +289,9 @@ export class StationRenderer {
     height: number,
     time: number,
     dt: number,
+    cameraView?:{x:number;y:number;radius:number},
   ) {
-    const own = data.players.find((p) => p.id === playerId);
+    const own = cameraView?{id:"camera-monitor",x:cameraView.x,y:cameraView.y,alive:true}:data.players.find((p) => p.id === playerId);
     if (!own) return;
     const camera = this.cameraPosition || { x: own.x, y: own.y };
     const blend = Math.min(1, dt * 14);
@@ -465,7 +466,7 @@ export class StationRenderer {
     }
     // A ray-cast mask matches wall and closed-door occlusion. Network filtering is authoritative.
     if (own.alive) {
-      const radius = data.vision_radius || 520,
+      const radius = cameraView?.radius || data.vision_radius || 520,
         walls = [
           ...station.walls,
           ...(data.doors || []).filter((d) => d.closed).map((d) => d.bounds),

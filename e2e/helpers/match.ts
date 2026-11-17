@@ -51,10 +51,10 @@ export async function match(
     const context = await browser.newContext({
       viewport: { width: 1280, height: 900 },
     });
-    await context.addInitScript(
-      (g) => localStorage.setItem("crew-mission-guest-v1", JSON.stringify(g)),
-      guest,
-    );
+    await context.addInitScript((g) => {
+      if (location.origin !== "null")
+        localStorage.setItem("crew-mission-guest-v1", JSON.stringify(g));
+    }, guest);
     const page = await context.newPage();
     const c: Client = {
       page,

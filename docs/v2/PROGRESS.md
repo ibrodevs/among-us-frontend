@@ -23,7 +23,7 @@ The updated backend main was audited at `6d89208` (previous gameplay work merged
 ## Evidence obtained
 
 - Baseline: 69 backend tests passed.
-- Current checkpoint: `python manage.py test --noinput` — **91 tests passed**, PostgreSQL + Redis, including real PostgreSQL concurrent critical sabotage and actual Channels socket privacy checks.
+- Current checkpoint: `python manage.py test --noinput` — **99 tests passed**, PostgreSQL + Redis, including real PostgreSQL concurrent critical sabotage and actual Channels socket privacy checks.
 - `python scripts/check_map.py` — both v1 and Asterion match frontend byte-for-byte; legacy file unchanged.
 - `python -m scripts.check_asterion` — full: 5,656 reachable cells / 67 goals / 21 rooms; compact: 2,520 cells / 31 goals / 9 rooms.
 - Paired frontend has passed 20 real task-panel submissions through WebSocket to these Django validators. The panel suite explicitly seeds its disposable local test assignments; it does not mock requests or replace the server.
@@ -50,4 +50,11 @@ The 20 task panels have separate controls: contact pairing, electrical routing, 
 
 Global Web Audio lives in `src/features/audio`: AudioManager, SoundRegistry, AudioProvider, AudioSettings and EventSoundBridge. It creates a context only after user interaction, persists validated volume/mute preferences, limits concurrent voices, attenuates spatial events and synthesizes original effects and ambient layers. No extracted or third-party recordings are used.
 
-Measured earlier browser observations: four concurrent headless clients ~50.7 FPS; ten concurrent headless clients ~33.6 FPS. These are development-Mac concurrency observations, not physical mobile-device benchmarks. Final standalone and CPU-throttled profiles are pending and must be reported separately.
+Historical FPS files were captured before a Canvas CSS sizing defect was found (the surface remained at its default 300×150 size). They are retained for traceability and MUST NOT be used as full-viewport performance evidence. New full-size desktop and CPU-throttled mobile profiles are in evidence/v2-render-profile.json: desktop samples 56.3–60 FPS, mobile CPU×4 samples 60 FPS, bounded cache 6–18 chunks. Separate mobile DPR2 rendering/audio checks passed in Chromium and WebKit. These are emulated development-machine measurements, not physical-device benchmarks.
+
+## Latest finalization checkpoint
+
+- 99 backend tests and 11 frontend unit tests passed. Frontend lint, TypeScript checks and production build passed.
+- All 20 real task panels passed again after rotor synchronization changes. Chromium and WebKit audio gesture unlock/mute persistence/mobile Retina rendering passed.
+- Final terminal/mechanics/4–10-player/legacy regression is running. A real repair-slider keyboard interception defect was found and fixed; its end-to-end retest is pending.
+- Backend draft PR: https://github.com/ibrodevs/among-us-backend/pull/6 . CI and independent review are required before merge.

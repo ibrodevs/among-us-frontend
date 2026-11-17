@@ -2,6 +2,7 @@ import type { PointerEvent, RefObject } from "react";
 import type { Direction, InputState } from "../engine/input";
 import { mapConfig } from "../engine/map-config";
 import styles from "../game.module.css";
+import { Joystick } from "./Joystick";
 import { Icon } from "./Icon";
 
 export function GameHud({
@@ -72,10 +73,12 @@ export function GameControls({
   input,
   paused,
   escapeLabel = "Пауза",
+  analog = false,
 }: {
   input: RefObject<InputState>;
   paused: boolean;
   escapeLabel?: string;
+  analog?: boolean;
 }) {
   function release(event: PointerEvent<HTMLButtonElement>) {
     input.current.pointers.delete(event.pointerId);
@@ -105,6 +108,7 @@ export function GameControls({
           <Icon name="keyboard" />
           <strong>Движение</strong>
         </div>
+        {analog && <Joystick input={input} paused={paused} />}
         <div
           className={styles.dpad}
           role="group"

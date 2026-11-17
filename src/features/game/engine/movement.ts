@@ -14,7 +14,7 @@ export function updateMovement(
   const length = Math.hypot(direction.x, direction.y);
   if (length === 0 || dt <= 0) return position;
 
-  const step = (speed * Math.min(dt, MAX_DELTA_SECONDS)) / length;
+  const step = (speed * Math.min(dt, MAX_DELTA_SECONDS)) / Math.max(1, length);
   const horizontal = { x: position.x + direction.x * step, y: position.y };
   const x = detectCollision(horizontal, map) ? position.x : horizontal.x;
   const vertical = { x, y: position.y + direction.y * step };

@@ -2,6 +2,7 @@ import { solveTask } from "./helpers/tasks";
 import { test, expect, type Page } from "@playwright/test";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
+import { existsSync } from "node:fs";
 import type { OwnState } from "../src/features/game/network/types";
 import catalog from "../src/features/game/engine/task-catalog.json";
 const fixture = `import os,sys,django
@@ -57,10 +58,10 @@ test("all 20 real task panels submit through WebSocket to Django validators", as
     let crewIndex = -1;
     for (let i = 0; i < 4; i++) {
       const context = await browser.newContext();
-      await context.addInitScript(
-        (g) => localStorage.setItem("crew-mission-guest-v1", JSON.stringify(g)),
-        guests[i],
-      );
+      await context.addInitScript((g) => {
+        if (location.origin !== "null")
+          localStorage.setItem("crew-mission-guest-v1", JSON.stringify(g));
+      }, guests[i]);
       const candidate = await context.newPage();
       candidate.on("websocket", (ws) =>
         ws.on("framereceived", (f) => {
@@ -79,7 +80,10 @@ test("all 20 real task panels submit through WebSocket to Django validators", as
       own = null;
     }
     if (!page) throw new Error("Crew not found");
-    const backend = path.resolve("../among-us-backend"),
+    const backend = path.resolve(
+        process.env.CREW_BACKEND_DIR ||
+          (existsSync("backend/manage.py") ? "backend" : "../among-us-backend"),
+      ),
       python =
         process.env.CREW_BACKEND_PYTHON ||
         path.join(backend, "venv/bin/python");

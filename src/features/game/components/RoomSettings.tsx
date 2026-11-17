@@ -45,6 +45,7 @@ export function RoomSettings({
         <label>
           Карта
           <select
+            aria-label="Карта"
             value={String(settings.map_version)}
             onChange={(e) => change("map_version", Number(e.target.value))}
           >
@@ -55,6 +56,7 @@ export function RoomSettings({
         <label>
           Область
           <select
+            aria-label="Область"
             value={String(settings.area)}
             onChange={(e) => change("area", e.target.value)}
           >

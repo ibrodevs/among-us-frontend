@@ -8,6 +8,7 @@ for (const engine of [chromium, webkit])
       const context = await browser.newContext({
         viewport: { width: 390, height: 844 },
         hasTouch: true,
+        deviceScaleFactor: 2,
         isMobile: true,
       });
       await context.addInitScript(() => {
@@ -66,6 +67,13 @@ for (const engine of [chromium, webkit])
         page.getByRole("heading", { name: "ASTERION · Демо карты" }),
       ).toBeVisible();
       await page.waitForTimeout(6000);
+      const bounds = await page.locator("canvas").boundingBox();
+      expect(bounds!.width).toBeGreaterThan(330);
+      expect(
+        await page
+          .locator("canvas")
+          .evaluate((el: HTMLCanvasElement) => el.width),
+      ).toBeGreaterThan(650);
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth,

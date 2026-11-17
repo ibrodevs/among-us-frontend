@@ -38,6 +38,8 @@ export type OwnState = {
   observation?: {
     type: string;
     counts?: Record<string, number>;
+    bodies?: Snapshot["bodies"];
+    effects?: Snapshot["effects"];
     players?: {
       id: string;
       nickname?: string;
@@ -100,6 +102,7 @@ export type Snapshot = {
   game_id: string;
   state_version: number;
   server_time: string;
+  started_at?: string;
   phase: "playing" | "meeting" | "finished";
   players: LivePlayer[];
   bodies: {
@@ -115,6 +118,7 @@ export type Snapshot = {
   meeting: null | {
     id: string;
     channel?: string;
+    source?: "report" | "emergency";
     messages?: {
       id: string;
       player_id: string;

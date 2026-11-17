@@ -36,7 +36,7 @@ export function ColorPicker({
   const own = players.find((p) => p.player_id === playerId)?.color;
   return (
     <fieldset>
-      <legend>Цвет вашего робота</legend>
+      <legend>Цвет робота на Asterion</legend>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         {palette.map((color, i) => (
           <button

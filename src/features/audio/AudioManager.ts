@@ -41,6 +41,17 @@ export class AudioManager {
   context: AudioContext | null = null;
   private master: GainNode | null = null;
   private active = new Set<OscillatorNode>();
+  private effects = new Map<OscillatorNode, GainNode>();
+  cancelEffects() {
+    const c = this.context;
+    if (!c) return;
+    for (const [osc, gain] of this.effects) {
+      gain.gain.cancelScheduledValues(c.currentTime);
+      gain.gain.setTargetAtTime(0.0001, c.currentTime, 0.01);
+      osc.stop(c.currentTime + 0.05);
+    }
+    this.effects.clear();
+  }
   private musicTimer: ReturnType<typeof setInterval> | null = null;
   private beat = 0;
   preferences = { ...defaults };
@@ -107,8 +118,10 @@ export class AudioManager {
     panner.pan.value = Math.min(1, Math.max(-1, pan));
     osc.connect(gain).connect(panner).connect(this.master);
     this.active.add(osc);
+    if (duration < 1) this.effects.set(osc, gain);
     osc.onended = () => {
       this.active.delete(osc);
+      this.effects.delete(osc);
       osc.disconnect();
       gain.disconnect();
       panner.disconnect();
@@ -197,6 +210,7 @@ export class AudioManager {
       n.disconnect();
     }
     this.active.clear();
+    this.effects.clear();
     void this.context?.close();
     this.context = null;
     this.master = null;

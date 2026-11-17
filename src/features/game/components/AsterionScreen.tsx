@@ -16,6 +16,9 @@ import { StationMap } from "./StationMap";
 import { GameControls } from "./GameHud";
 import { sound } from "../../audio/events";
 import css from "./asterion.module.css";
+const terminalNames:Record<string,string>={cameras:"Камеры станции",admin:"Сводка Admin",vitals:"Состояние экипажа"};
+const roleNames:Record<string,string>={technician:'Техник',medic:'Медик',tracker:'Следопыт',guardian:'Хранитель',mimic:'Мимик'};
+const roleHelp:Record<string,string>={technician:'Тоннели доступны до 20 секунд. После выхода — 30 секунд перезарядки.',medic:'Терминал Vitals показывает состояние экипажа с задержкой 5 секунд.',tracker:'Показывает последнюю известную зону на 8 секунд. Перезарядка — 35 секунд.',guardian:'После гибели можно дважды защитить живого игрока на 10 секунд.',mimic:'Облик выбранного игрока действует 12 секунд. Перезарядка — 45 секунд.'};
 export function AsterionScreen({
   code,
   net,
@@ -35,11 +38,13 @@ export function AsterionScreen({
   useEffect(() => {
     if (net.error) sound("ui.error");
   }, [net.error]);
+  const observing=Boolean(own?.observation);
   const close = useCallback(() => {
     setTaskId(null);
     setMap(null);
     setHolding(false);
-  }, []);
+    if(observing)send({type:"terminal.use",terminal_id:""});
+  }, [observing,send]);
   const paused =
     status !== "connected" ||
     snapshot?.phase !== "playing" ||
@@ -90,7 +95,7 @@ export function AsterionScreen({
         key = direction.x + "," + direction.y;
       if (key === "0,0" && previous === key) return;
       if (key !== "0,0") {
-        if (performance.now() - lastNonzero.current < 95) return;
+        if (performance.now() - lastNonzero.current < 100) return;
         lastNonzero.current = performance.now();
       }
       push(direction);
@@ -117,6 +122,8 @@ export function AsterionScreen({
       )
         flush();
     };
+    window.addEventListener("pointerdown", flush);
+    window.addEventListener("pointermove", flush);
     window.addEventListener("keydown", press);
     window.addEventListener("keyup", release);
     window.addEventListener("pointerup", release);
@@ -124,6 +131,8 @@ export function AsterionScreen({
     window.addEventListener("blur", release);
     return () => {
       clearInterval(id);
+      window.removeEventListener("pointerdown", flush);
+      window.removeEventListener("pointermove", flush);
       window.removeEventListener("keydown", press);
       window.removeEventListener("keyup", release);
       window.removeEventListener("pointerup", release);
@@ -184,6 +193,8 @@ export function AsterionScreen({
         .map((p) => ({ ...p, sabotage_id: s.id, kind: s.kind })),
     )
     .find((p) => distance(p) <= 90);
+  const remaining=(stamp?:string|null)=>Math.max(0,Math.ceil((Date.parse(stamp||" ")-now)/1000))||0;
+  const ventCooldown=remaining(own.vent_available_at),abilityCooldown=remaining(own.ability_available_at);
   const killCooldown =
     Math.max(
       0,
@@ -293,13 +304,14 @@ export function AsterionScreen({
                   ? "Экипаж"
                   : "Предатель"
                 : "Призрак · задания доступны"}{" "}
-              {own.special_role && `· ${own.special_role}`}
+              {own.special_role && `· ${roleNames[own.special_role]||own.special_role}`}
             </span>
           </div>
           <div className={css.viewport}>
             <AsterionCanvas snapshot={snapshot} playerId={playerId} />
           </div>
           <GameControls
+            analog
             input={input}
             paused={paused}
             escapeLabel="Закрыть панель"
@@ -340,6 +352,7 @@ export function AsterionScreen({
                 className="action secondary"
                 disabled={
                   !own.alive ||
+                  ventCooldown>0 ||
                   status !== "connected" ||
                   (!vent && !own.is_in_vent)
                 }
@@ -349,7 +362,7 @@ export function AsterionScreen({
                     : vent && send({ type: "vent.enter", vent_id: vent.id })
                 }
               >
-                {own.is_in_vent ? "Выйти из люка" : "Люк"}
+                {own.is_in_vent ? "Выйти из люка" : "Люк"}{ventCooldown>0?` · ${ventCooldown} с`:""}
               </button>
             )}
             <button
@@ -417,12 +430,13 @@ export function AsterionScreen({
           {own.is_in_vent && (
             <section className={css.terminal}>
               <h2>Сеть тоннелей</h2>
-              <p>Текущее положение: {own.current_vent_id}</p>
+              <p>Текущее положение: {station.rooms.find(r=>r.id===station.vents.find(v=>v.id===own.current_vent_id)?.room_id)?.name}</p>
               <div className={css.actions}>
                 {own.vent_connections?.map((v) => (
                   <button
                     key={v.id}
                     className="action"
+                    disabled={ventCooldown>0}
                     onClick={() => send({ type: "vent.travel", vent_id: v.id })}
                   >
                     {station.rooms.find((r) => r.id === v.room_id)?.name}
@@ -473,14 +487,16 @@ export function AsterionScreen({
               </section>
             )}
           {own.observation && (
-            <section className={css.terminal}>
-              <h2>Терминал · {own.observation.type}</h2>
+            <div className="modal-backdrop"><section className={`modal ${css.task}`} role="dialog" aria-modal="true" aria-labelledby="terminal-title">
+              <h2 id="terminal-title">{terminalNames[own.observation.type]}</h2>
               <button
+                autoFocus
                 className="action secondary"
                 onClick={() => send({ type: "terminal.use", terminal_id: "" })}
               >
                 Закрыть терминал
               </button>
+              {own.observation.type==='admin'&&<svg className={css.map} viewBox="0 0 6144 4096" style={{maxHeight:250}} role="img" aria-label="Количество людей по помещениям"><g fill="#30465a" stroke="#7697ad" strokeWidth="9">{station.corridors.map(c=><rect key={c.id} {...c.bounds}/>)}{station.rooms.map(r=><g key={r.id} opacity={snapshot.map_mode==='compact'&&!r.compact?0.2:1}><title>{r.name}: {own.observation?.counts?.[r.id]||0}</title><rect {...r.bounds} rx="25" fill={(own.observation?.counts?.[r.id]||0)>0?'#2e665c':'#203748'}/><text x={r.bounds.x+450} y={r.bounds.y+300} fill="#fff" stroke="none" fontSize="160" textAnchor="middle">{own.observation?.counts?.[r.id]||0}</text></g>)}</g></svg>}
               {own.observation.type === "admin" &&
                 Object.entries(own.observation.counts || {}).map(([id, n]) => (
                   <p key={id}>
@@ -491,7 +507,7 @@ export function AsterionScreen({
                 own.observation.players?.map((p) => (
                   <p key={p.id}>
                     {snapshot.roster?.find((r) => r.id === p.id)?.nickname}:{" "}
-                    {p.status}
+                    {p.status==="dead"?"Погиб":"Жив"}
                   </p>
                 ))}
               {own.observation.type === "cameras" && (
@@ -499,6 +515,7 @@ export function AsterionScreen({
                   <label>
                     Камера
                     <select
+                      aria-label="Камера"
                       value={own.observation.camera?.id}
                       onChange={(e) =>
                         send({
@@ -510,40 +527,17 @@ export function AsterionScreen({
                     >
                       {station.cameras.map((c) => (
                         <option value={c.id} key={c.id}>
-                          {c.id}
+                          {station.rooms.find((r) => r.id === c.room_id)
+                            ?.name || c.id}
                         </option>
                       ))}
                     </select>
                   </label>
-                  <svg
-                    viewBox={`${(own.observation.camera?.x || 0) - 550} ${(own.observation.camera?.y || 0) - 550} 1100 1100`}
-                    className={css.map}
-                  >
-                    {station.rooms.map((r) => (
-                      <rect
-                        key={r.id}
-                        {...r.bounds}
-                        fill="#213a50"
-                        stroke="#789"
-                      />
-                    ))}
-                    {own.observation.players?.map((p) => (
-                      <g key={p.id}>
-                        <circle cx={p.x} cy={p.y} r="25" fill="#7be5d0" />
-                        <text
-                          x={p.x}
-                          y={(p.y || 0) - 40}
-                          fill="#fff"
-                          fontSize="35"
-                        >
-                          {p.nickname}
-                        </text>
-                      </g>
-                    ))}
-                  </svg>
+                  {own.observation.camera&&<div className={css.viewport} style={{height:320,minHeight:240}} aria-label="Изображение камеры"><AsterionCanvas key={own.observation.camera.id} playerId="camera-monitor" camera={own.observation.camera} snapshot={{...snapshot,vision_radius:own.observation.camera.radius,players:(own.observation.players||[]).map(p=>({id:p.id,nickname:p.nickname||'',x:p.x||0,y:p.y||0,color:p.color,alive:true})),bodies:own.observation.bodies||[],effects:own.observation.effects||[]}}/></div>}
+
                 </>
               )}
-            </section>
+            </section></div>
           )}
         </section>
         <aside className={css.aside}>
@@ -569,51 +563,7 @@ export function AsterionScreen({
               {t.stage_total || 1}
             </button>
           ))}
-          {own.special_role && (
-            <>
-              <h3>{own.special_role}</h3>
-              <select
-                aria-label="Цель способности"
-                value={abilityTarget}
-                onChange={(e) => setAbilityTarget(e.target.value)}
-              >
-                <option value="">Выберите игрока</option>
-                {snapshot.roster
-                  ?.filter((p) => p.id !== playerId)
-                  .map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.nickname}
-                    </option>
-                  ))}
-              </select>
-              <button
-                className="action"
-                disabled={
-                  !abilityTarget ||
-                  (own.ability_available_at
-                    ? Date.parse(own.ability_available_at) > now
-                    : false)
-                }
-                onClick={() =>
-                  send({
-                    type: "player.ability.use",
-                    target_player_id: abilityTarget,
-                  })
-                }
-              >
-                Применить способность
-              </button>
-              {Boolean(own.ability_state?.tracking) && (
-                <p>
-                  Последняя зона:{" "}
-                  {String(
-                    (own.ability_state?.tracking as { room_id: string })
-                      .room_id || "неизвестна",
-                  )}
-                </p>
-              )}
-            </>
-          )}
+          {own.special_role&&<><h3>{roleNames[own.special_role]||own.special_role}</h3><p>{roleHelp[own.special_role]}</p>{['tracker','mimic','guardian'].includes(own.special_role)&&<><select aria-label="Цель способности" value={abilityTarget} onChange={e=>setAbilityTarget(e.target.value)}><option value="">Выберите игрока</option>{snapshot.roster?.filter(p=>p.id!==playerId).map(p=><option key={p.id} value={p.id}>{p.nickname}</option>)}</select><button className="action" disabled={!abilityTarget||abilityCooldown>0||paused||(!own.alive&&own.special_role!=='guardian')||(own.special_role==='guardian'&&Number(own.ability_state?.shields_used||0)>=2)} onClick={()=>send({type:'player.ability.use',target_player_id:abilityTarget})}>Применить способность{abilityCooldown?` · ${abilityCooldown} с`:''}</button></>}{own.special_role==='guardian'&&<p>Использовано защит: {Number(own.ability_state?.shields_used||0)} / 2</p>}{Boolean(own.ability_state?.tracking)&&Date.parse((own.ability_state?.tracking as {until:string}).until)>now&&<p>Последняя зона: {station.rooms.find(r=>r.id===(own.ability_state?.tracking as {room_id:string}).room_id)?.name||'неизвестна'}</p>}</>}
           <p className="muted">
             M — карта · Esc — закрыть панель. После гибели продолжайте выполнять
             задания.
@@ -624,6 +574,7 @@ export function AsterionScreen({
         <StationMap
           snapshot={snapshot}
           own={own}
+          serverNow={now}
           tactical={map === "tactical"}
           send={send}
           onClose={close}

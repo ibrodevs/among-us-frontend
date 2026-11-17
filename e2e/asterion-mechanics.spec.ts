@@ -138,6 +138,7 @@ test("vents, lights, dual reactor, locked doors, ghost tasks, report, channels a
         .getByRole("button", { name: "Ремонт · reactor", exact: true })
         .click();
     for (const c of [a, b]) {
+      await c.page.getByRole("button", {name:"Удерживать",exact:true}).scrollIntoViewIfNeeded();
       const r = await c.page
         .getByRole("button", { name: "Удерживать", exact: true })
         .boundingBox();

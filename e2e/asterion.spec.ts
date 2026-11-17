@@ -71,6 +71,10 @@ for (const count of [4, 10])
         await expect.poll(() => c.snapshot?.protocol_version).toBe(2);
         await expect.poll(() => c.own?.map_version).toBe(2);
         expect(c.snapshot?.map_mode).toBe(count === 4 ? "compact" : "full");
+        const canvasBounds = await c.page.locator("canvas").boundingBox();
+        expect(canvasBounds!.width).toBeGreaterThan(
+          c === clients[3] ? 330 : 800,
+        );
         expect(c.own?.tasks.length).toBe(c.own?.role === "crew" ? 7 : 0);
         expect(c.snapshot?.players.every((p) => !("role" in p))).toBeTruthy();
         expect(

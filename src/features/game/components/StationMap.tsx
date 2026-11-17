@@ -9,13 +9,17 @@ export function StationMap({
   onClose,
   send,
   tactical = false,
+  serverNow=Date.now(),
 }: {
   snapshot: Snapshot;
   own: OwnState;
   onClose: () => void;
   send: (c: Command) => boolean;
   tactical?: boolean;
+  serverNow?:number;
 }) {
+  const cooldown=Math.max(0,Math.ceil((Date.parse(own.sabotage_available_at||" ")-serverNow)/1000))||0;
+  const unavailable=cooldown>0||own.is_in_vent||(!own.alive&&!snapshot.settings?.ghost_sabotage);
   const [sector, setSector] = useState("all");
   const [roomId, setRoomId] = useState("");
   const area =
@@ -55,6 +59,7 @@ export function StationMap({
         <label>
           Сектор{" "}
           <select
+            aria-label="Сектор"
             value={sector}
             onChange={(e) => {
               setSector(e.target.value);
@@ -70,7 +75,11 @@ export function StationMap({
         </label>
         <label>
           Помещение{" "}
-          <select value={roomId} onChange={(e) => setRoomId(e.target.value)}>
+          <select
+            aria-label="Помещение"
+            value={roomId}
+            onChange={(e) => setRoomId(e.target.value)}
+          >
             <option value="">Обзор станции</option>
             {station.rooms.map((r) => (
               <option
@@ -176,12 +185,14 @@ export function StationMap({
           ● Вы · <span style={{ color: "#f1cf76" }}>● Ваши задания</span> ·{" "}
           <span style={{ color: "#ed687b" }}>● Авария / закрытая дверь</span>
         </p>
+        {tactical&&cooldown>0&&<p>Системы восстанавливаются · {cooldown} с</p>}
         {tactical && (
           <div className={css.grid}>
             {["lights", "reactor", "oxygen", "comms"].map((kind) => (
               <button
                 className="action"
                 key={kind}
+                disabled={unavailable||snapshot.sabotages?.some(s=>s.kind===kind||(["reactor","oxygen"].includes(kind)&&["reactor","oxygen"].includes(s.kind)))}
                 onClick={() => send({ type: "sabotage.start", kind })}
               >
                 {kind}
@@ -192,6 +203,7 @@ export function StationMap({
                 <button
                   key={group}
                   className="action secondary"
+                  disabled={unavailable||snapshot.sabotages?.some(s=>s.kind==="doors")}
                   onClick={() =>
                     send({ type: "sabotage.start", kind: "doors", group })
                   }
