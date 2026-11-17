@@ -327,7 +327,8 @@ export class StationRenderer {
       ctx.arc(e.x, e.y, 20 + age * 40, 0, Math.PI * 2);
       ctx.stroke();
     }
-    // A ray-cast mask matches wall and closed-door occlusion. Network filtering is authoritative.
+    // Keep known architecture and furniture readable. Server-filtered snapshots
+    // remain authoritative for players, bodies and transient effects behind walls.
     if (own.alive && !cameraView?.review) {
       const radius = cameraView?.radius || data.vision_radius || 520,
         walls = [
@@ -387,7 +388,8 @@ export class StationRenderer {
       ctx.moveTo(points[0].x, points[0].y);
       for (const p of points) ctx.lineTo(p.x, p.y);
       ctx.closePath();
-      ctx.fillStyle = "rgba(3,8,18,.93)";
+      const lightsOut = data.sabotages?.some((s) => s.kind === "lights");
+      ctx.fillStyle = lightsOut ? "rgba(3,8,18,.55)" : "rgba(3,8,18,.18)";
       ctx.fill("evenodd");
       ctx.restore();
     }
