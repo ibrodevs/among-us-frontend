@@ -72,7 +72,7 @@ export function AsterionScreen({
   const input = useGameInput(paused, close),
     seq = useRef(Date.now());
   useEffect(() => {
-    const id = setInterval(() => setClock(Date.now()), 100);
+    const id = setInterval(() => setClock(Date.now()), 250);
     const key = (e: KeyboardEvent) => {
       if (
         e.code === "KeyM" &&
@@ -109,7 +109,8 @@ export function AsterionScreen({
         push({ x: 0, y: 0 });
       return;
     }
-    let previous = "";
+    // No initial stop packet before a player has pressed movement controls.
+    let previous = "0,0";
     const flush = () => {
       const direction = readDirection(input.current),
         key = direction.x + "," + direction.y;
@@ -149,6 +150,7 @@ export function AsterionScreen({
     window.addEventListener("pointerup", release);
     window.addEventListener("pointercancel", release);
     window.addEventListener("blur", release);
+    document.addEventListener("visibilitychange", release);
     return () => {
       clearInterval(id);
       window.removeEventListener("pointerdown", flush);
@@ -158,6 +160,7 @@ export function AsterionScreen({
       window.removeEventListener("pointerup", release);
       window.removeEventListener("pointercancel", release);
       window.removeEventListener("blur", release);
+      document.removeEventListener("visibilitychange", release);
     };
   }, [paused, send, input, own?.is_in_vent, snapshot?.phase, status]);
   const task = own?.tasks.find((t) => t.id === taskId && !t.is_completed);
@@ -335,6 +338,10 @@ export function AsterionScreen({
               snapshot={snapshot}
               playerId={playerId}
               tasks={own.tasks}
+              ownState={own}
+              movementSequence={seq}
+              input={input}
+              active={!paused}
             />
           </div>
           <GameControls

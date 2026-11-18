@@ -51,6 +51,10 @@ async function until(check, label, timeout = 30000) {
 function send(c, data) {
   if (c.ws.readyState === WebSocket.OPEN) c.ws.send(JSON.stringify(data));
 }
+function nextSeq(c) {
+  c.seq = Math.max(c.seq, c.own?.last_move_seq || 0, Date.now()) + 1;
+  return c.seq;
+}
 async function connect(c) {
   const ws = new WebSocket(
     api.replace(/^http/, "ws") + "/ws/rooms/" + code + "/",
@@ -101,7 +105,8 @@ try {
     .code;
   for (let i = 1; i < 20; i++)
     await request("/api/v1/rooms/join/", { code }, guests[i].token);
-  await request("/api/v1/rooms/join/", { code }, guests[20].token, "POST", 409);
+  const overflow = await request("/api/v1/rooms/join/", { code }, guests[20].token, "POST", 409);
+  if (overflow.code !== "ROOM_FULL") throw new Error("The 21st guest did not receive ROOM_FULL");
   await request(
     `/api/v1/rooms/${code}/settings/`,
     { max_players: 21 },
@@ -142,6 +147,7 @@ try {
       snapshot: null,
       snapshots: 0,
       pending: new Map(),
+      seq: 0,
     };
     clients.push(c);
     await connect(c);
@@ -206,24 +212,36 @@ try {
         y - 14 < r.y + r.height &&
         y + 14 > r.y,
     );
-  for (const c of clients) {
-    if (c === caller) continue;
-    const d = [
+  const directions = clients.map((c) => {
+    const candidates = [
       { x: 1, y: 0 },
       { x: -1, y: 0 },
       { x: 0, y: 1 },
       { x: 0, y: -1 },
-    ].find((d) =>
-      [10, 30, 60].every((n) => free(c.own.x + d.x * n, c.own.y + d.y * n)),
+    ].filter((d) =>
+      [10, 30, 60].every((n) =>
+        free(c.own.x + d.x * n, c.own.y + d.y * n) &&
+        (c !== caller || Math.hypot(
+          c.own.x + d.x * n - map.emergency.x,
+          c.own.y + d.y * n - map.emergency.y,
+        ) < 85),
+      ),
     );
+    const d = candidates[0];
     if (!d) throw new Error("No clear movement direction");
-    const seq = Date.now();
-    c.pending.set(seq, performance.now());
-    send(c, { type: "player.move", seq, direction: d });
+    const strength = c === caller ? 0.3 : 0.55;
+    return { x: d.x * strength, y: d.y * strength };
+  });
+  for (let pulse = 0; pulse < 4; pulse++) {
+    clients.forEach((c, i) => {
+      const seq = nextSeq(c);
+      c.pending.set(seq, performance.now());
+      send(c, { type: "player.move", seq, direction: directions[i] });
+    });
+    await sleep(120);
   }
-  await sleep(450);
   for (const c of clients) {
-    const seq = Date.now();
+    const seq = nextSeq(c);
     c.stopSeq = seq;
     c.pending.set(seq, performance.now());
     send(c, { type: "player.move", seq, direction: { x: 0, y: 0 } });
@@ -235,7 +253,7 @@ try {
   const moved = clients.filter(
     (c, i) => Math.hypot(c.own.x - before[i].x, c.own.y - before[i].y) > 5,
   ).length;
-  if (moved < 18) throw new Error("Movement did not advance: " + moved);
+  if (moved !== 20) throw new Error("Movement did not advance for all twenty clients: " + moved);
   const c = clients[0],
     role = c.own.role,
     position = { x: c.own.x, y: c.own.y },

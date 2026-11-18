@@ -3,6 +3,7 @@ import WebSocket from "ws";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
+import { dirname } from "node:path";
 const api = process.env.CREW_API_URL || "http://127.0.0.1:8000",
   seconds = Number(process.env.CREW_SOAK_SECONDS || 1800),
   out = process.env.CREW_SOAK_OUTPUT || "docs/capacity-20/soak-20.json";
@@ -45,6 +46,7 @@ const guests = [],
     reconnects: 0,
   },
   rtts = [],
+  rttChanges = [],
   acks = [],
   samples = [];
 let room = "",
@@ -108,6 +110,8 @@ function move(c, d) {
 }
 async function connect(c) {
   c.auth = false;
+  c.pingAt = null;
+  c.previousRtt = null;
   const ws = new WebSocket(
     api.replace(/^http/, "ws") + "/ws/rooms/" + room + "/",
     { origin: process.env.CREW_FRONTEND_URL || "http://localhost:3000" },
@@ -118,17 +122,22 @@ async function connect(c) {
   );
   ws.on("error", (e) => errors.push({ type: "socket", detail: e.message }));
   ws.on("close", () => {
+    if (c.ws !== ws) return;
     c.auth = false;
     if (!c.plannedClose && !reconnecting)
       errors.push({ type: "unexpected-disconnect", client: c.index });
   });
   ws.on("message", (raw) => {
+    if (c.ws !== ws) return;
     const m = JSON.parse(raw);
     c.bytes += raw.length;
     if (m.type === "auth.ok") c.auth = true;
-    if (m.type === "pong" && c.pingAt) {
-      rtts.push(clock() - c.pingAt);
-      c.pingAt = 0;
+    if (m.type === "pong" && c.pingAt !== null) {
+      const rtt = clock() - c.pingAt;
+      rtts.push(rtt);
+      if (c.previousRtt !== null) rttChanges.push(Math.abs(rtt - c.previousRtt));
+      c.previousRtt = rtt;
+      c.pingAt = null;
     }
     if (m.type === "error") {
       rejections[m.code] = (rejections[m.code] || 0) + 1;
@@ -611,8 +620,9 @@ try {
   epoch = clock();
   heartbeat = setInterval(() => {
     for (const c of clients) {
-      c.pingAt = clock();
-      send(c, { type: "ping" });
+      if (c.auth && c.pingAt === null && send(c, { type: "ping" })) {
+        c.pingAt = clock();
+      }
     }
   }, 3000);
   loop = setInterval(() => {
@@ -727,12 +737,15 @@ try {
     counts,
     rtt: {
       samples: rtts.length,
-      mean: rtts.reduce((a, b) => a + b, 0) / rtts.length,
+      mean: rtts.length ? rtts.reduce((a, b) => a + b, 0) / rtts.length : null,
+      median: percentile(rtts, 0.5),
       p95: percentile(rtts, 0.95),
       p99: percentile(rtts, 0.99),
+      jitterP95: percentile(rttChanges, 0.95),
     },
     ack: {
       samples: acks.length,
+      median: percentile(acks, 0.5),
       p95: percentile(acks, 0.95),
       p99: percentile(acks, 0.99),
     },
@@ -740,10 +753,11 @@ try {
     rejections,
     bytes: clients.reduce((n, c) => n + c.bytes, 0),
     samples,
-    environment:
-      "Local development machine, real PostgreSQL/Redis/Daphne/clock and 20 active bots. Not a Northflank Free performance claim.",
+    environment: ["localhost", "127.0.0.1", "[::1]"].includes(new URL(api).hostname)
+      ? "Local API endpoint, 20 active bots."
+      : "Remote API endpoint, 20 active bots.",
   };
-  mkdirSync(out.slice(0, out.lastIndexOf("/")), { recursive: true });
+  mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, JSON.stringify(report, null, 2) + "\n");
   console.log(
     JSON.stringify({

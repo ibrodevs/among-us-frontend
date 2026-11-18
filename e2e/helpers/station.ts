@@ -11,15 +11,17 @@ export type Client = {
 };
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export async function walk(c: Client, target: { x: number; y: number }) {
+  const ghost = c.own?.alive === false;
   const size = 20,
     w = Math.ceil(station.width / size),
     h = Math.ceil(station.height / size),
-    walls = [
+    walls = ghost ? [] : [
       ...station.walls,
       ...(c.snapshot?.doors || []).filter((d) => d.closed).map((d) => d.bounds),
     ],
     clear = (x: number, y: number, half = 20) =>
-      !walls.some(
+      x >= half && y >= half && x <= station.width - half &&
+      y <= station.height - half && !walls.some(
         (r) =>
           x - half < r.x + r.width &&
           x + half > r.x &&
@@ -42,7 +44,7 @@ export async function walk(c: Client, target: { x: number; y: number }) {
       }
   while (head < tail) {
     const n = queue[head++];
-    for (const q of [n - 1, n + 1, n - w, n + w])
+    for (const q of neighbors(n))
       if (
         q >= 0 &&
         q < w * h &&
@@ -52,6 +54,10 @@ export async function walk(c: Client, target: { x: number; y: number }) {
         ds[q] = ds[n] + 1;
         queue[tail++] = q;
       }
+  }
+  function neighbors(n: number) {
+    const x = n % w;
+    return [n - w, n + w, x > 0 ? n - 1 : -1, x < w - 1 ? n + 1 : -1];
   }
   const began = Date.now();
   while (Math.hypot(c.own!.x! - target.x, c.own!.y! - target.y) >= 75) {
@@ -80,6 +86,7 @@ export async function walk(c: Client, target: { x: number; y: number }) {
         cy = Math.floor(pos.y / size);
       for (let y = cy - 4; y <= cy + 4; y++)
         for (let x = cx - 4; x <= cx + 4; x++) {
+          if (x < 0 || x >= w || y < 0 || y >= h) continue;
           const q = y * w + x,
             dx = x * size + 10 - pos.x,
             dy = y * size + 10 - pos.y,
@@ -101,7 +108,7 @@ export async function walk(c: Client, target: { x: number; y: number }) {
     let best = n,
       delta = 0;
     for (let i = 0; !recovery && i < 4; i++) {
-      const q = [best - 1, best + 1, best - w, best + w].find(
+      const q = neighbors(best).find(
         (q) => ds[q] >= 0 && ds[q] < ds[best],
       );
       if (q === undefined || (i && q - best !== delta)) break;

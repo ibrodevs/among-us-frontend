@@ -191,13 +191,14 @@ for (const count of [4, 10])
         );
         await clients[0].page.waitForTimeout(1000);
         await Promise.all(clients.map((c) => c.page.keyboard.up("ArrowRight")));
-        for (let i = 0; i < clients.length; i++) {
-          const delta =
-            clients[i].snapshot!.players.find((p) => p.id === clients[i].id)!
-              .x - before[i];
-          expect(delta).toBeGreaterThan(30);
-          expect(delta).toBeLessThan(190);
-        }
+        const movement = () => clients.map(
+          (c, i) => c.snapshot!.players.find((p) => p.id === c.id)!.x - before[i],
+        );
+        // Browser key release does not mean each socket has received the
+        // server updates generated while the key was held.
+        await expect.poll(() => Math.min(...movement()), { timeout: 5000 })
+          .toBeGreaterThan(30);
+        expect(Math.max(...movement())).toBeLessThan(190);
       }
       if (count === 4) {
         const mobile = clients[3],
