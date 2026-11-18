@@ -109,7 +109,8 @@ export function AsterionScreen({
         push({ x: 0, y: 0 });
       return;
     }
-    let previous = "";
+    // No initial stop packet before a player has pressed movement controls.
+    let previous = "0,0";
     const flush = () => {
       const direction = readDirection(input.current),
         key = direction.x + "," + direction.y;
