@@ -51,6 +51,10 @@ async function until(check, label, timeout = 30000) {
 function send(c, data) {
   if (c.ws.readyState === WebSocket.OPEN) c.ws.send(JSON.stringify(data));
 }
+function nextSeq(c) {
+  c.seq = Math.max(c.seq, c.own?.last_move_seq || 0, Date.now()) + 1;
+  return c.seq;
+}
 async function connect(c) {
   const ws = new WebSocket(
     api.replace(/^http/, "ws") + "/ws/rooms/" + code + "/",
@@ -143,6 +147,7 @@ try {
       snapshot: null,
       snapshots: 0,
       pending: new Map(),
+      seq: 0,
     };
     clients.push(c);
     await connect(c);
@@ -229,14 +234,14 @@ try {
   });
   for (let pulse = 0; pulse < 4; pulse++) {
     clients.forEach((c, i) => {
-      const seq = Date.now();
+      const seq = nextSeq(c);
       c.pending.set(seq, performance.now());
       send(c, { type: "player.move", seq, direction: directions[i] });
     });
     await sleep(120);
   }
   for (const c of clients) {
-    const seq = Date.now();
+    const seq = nextSeq(c);
     c.stopSeq = seq;
     c.pending.set(seq, performance.now());
     send(c, { type: "player.move", seq, direction: { x: 0, y: 0 } });
