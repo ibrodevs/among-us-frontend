@@ -31,11 +31,13 @@ export function useRoomSocket(code: string) {
       attempts = 0,
       retry: ReturnType<typeof setTimeout> | undefined,
       heartbeat: ReturnType<typeof setInterval> | undefined,
-      pingAt = 0,
-      lastMessage = Date.now();
+      lastMessage = performance.now();
     function connect() {
       if (disposed) return;
       setStatus(attempts ? "reconnecting" : "connecting");
+      setPing(null);
+      lastMessage = performance.now();
+      let pingAt: number | null = null;
       const ws = new WebSocket(
         WS_BASE + "/ws/rooms/" + encodeURIComponent(code) + "/",
       );
@@ -50,7 +52,7 @@ export function useRoomSocket(code: string) {
         );
       ws.onmessage = (event) => {
         if (disposed) return;
-        lastMessage = Date.now();
+        lastMessage = performance.now();
         let message;
         try {
           message = JSON.parse(event.data);
@@ -64,12 +66,13 @@ export function useRoomSocket(code: string) {
           setError("");
           attempts = 0;
           heartbeat = setInterval(() => {
-            if (Date.now() - lastMessage > 45000) {
+            const now = performance.now();
+            if (now - lastMessage > 45000 || (pingAt !== null && now - pingAt >= 45000)) {
               ws.close();
               return;
             }
-            if (ws.readyState === WebSocket.OPEN) {
-              pingAt = Date.now();
+            if (ws.readyState === WebSocket.OPEN && pingAt === null) {
+              pingAt = now;
               ws.send(JSON.stringify({ type: "ping" }));
             }
           }, 15000);
@@ -93,7 +96,10 @@ export function useRoomSocket(code: string) {
               : previous,
           );
         } else if (message.type === "pong") {
-          setPing(Date.now() - pingAt);
+          if (pingAt !== null) {
+            setPing(Math.round(performance.now() - pingAt));
+            pingAt = null;
+          }
         } else if (message.type === "error") {
           if (!["STALE_SEQ", "RATE_LIMITED"].includes(message.code))
             setError(message.detail);

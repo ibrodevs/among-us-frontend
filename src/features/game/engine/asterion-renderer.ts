@@ -8,6 +8,7 @@ import {
   drawTaskEquipment,
 } from "./asterion/StationFixtures";
 import { drawPlayer } from "./render-world";
+import { RemoteMotion } from "./remote-motion";
 export { station };
 export const palette = [
   "#5de4c7",
@@ -44,14 +45,24 @@ export class StationRenderer {
   private overview: HTMLCanvasElement | null = null;
   private chunks = new Map<string, HTMLCanvasElement>();
   private visionKey = "";
+  private visionAnchor: Vector2 | null = null;
   private visionPoints: Vector2[] = [];
   private cameraPosition: Vector2 | null = null;
   private doorProgress = new Map<string, number>();
   private positions = new Map<string, Vector2>();
+  private remote = new Map<string, { motion: RemoteMotion; alive: boolean }>();
+  private remoteSnapshot: Snapshot | null = null;
+  private closedDoors: NonNullable<Snapshot["doors"]> = [];
   clear() {
     this.overview = null;
+    this.visionKey = "";
+    this.visionAnchor = null;
+    this.visionPoints = [];
     this.chunks.clear();
     this.positions.clear();
+    this.remote.clear();
+    this.remoteSnapshot = null;
+    this.closedDoors = [];
     this.doorProgress.clear();
   }
   get cacheSize() {
@@ -106,11 +117,15 @@ export class StationRenderer {
       freeze?: boolean;
     },
     ownTasks?: Task[],
+    predictedOwn?: Vector2 | null,
   ) {
     if (cameraView?.freeze) time = 1000;
-    const own = cameraView
+    const serverOwn = cameraView
       ? { id: "camera-monitor", x: cameraView.x, y: cameraView.y, alive: true }
       : data.players.find((p) => p.id === playerId);
+    const own = serverOwn && predictedOwn && !cameraView
+      ? { ...serverOwn, x: predictedOwn.x, y: predictedOwn.y }
+      : serverOwn;
     if (!own) return;
     const camera = this.cameraPosition || { x: own.x, y: own.y };
     const blend = Math.min(1, dt * 14);
@@ -300,15 +315,55 @@ export class StationRenderer {
       box(ctx, { x: 24, y: 4, width: 13, height: 8 }, "#718a9c");
       ctx.restore();
     }
-    const ids = new Set(data.players.map((p) => p.id));
+    const remoteFrame = data !== this.remoteSnapshot;
+    const now = performance.now();
+    if (remoteFrame) {
+      if (data.game_id !== this.remoteSnapshot?.game_id || data.phase !== this.remoteSnapshot?.phase) {
+        this.remote.clear();
+      }
+      this.remoteSnapshot = data;
+      this.closedDoors = (data.doors ?? []).filter((door) => door.closed);
+    }
+    const half = station.player_hitbox / 2;
+    const outsideMap = ({ x, y }: Vector2) =>
+      x < half || y < half || x + half > station.width || y + half > station.height;
+    const blocked = (point: Vector2) => {
+      const { x, y } = point;
+      const overlaps = (r: Rect) =>
+        x - half < r.x + r.width && x + half > r.x &&
+        y - half < r.y + r.height && y + half > r.y;
+      return outsideMap(point) ||
+        station.walls.some(overlaps) ||
+        this.closedDoors.some((door) => overlaps(door.bounds));
+    };
+    const settingSpeed = data.settings?.speed;
+    const speed = typeof settingSpeed === "number" && Number.isFinite(settingSpeed)
+      ? settingSpeed : station.speed;
+    const ids = new Set(data.players.filter((p) => !p.in_vent).map((p) => p.id));
     for (const id of this.positions.keys())
       if (!ids.has(id)) this.positions.delete(id);
+    for (const id of this.remote.keys())
+      if (!ids.has(id)) this.remote.delete(id);
     for (const p of data.players) {
       if (p.in_vent) continue;
+      const local = p.id === playerId && predictedOwn && !cameraView;
+      let target = local ? predictedOwn : p;
+      if (p.id !== playerId && !cameraView?.freeze) {
+        let remote = this.remote.get(p.id);
+        if (!remote || remote.alive !== p.alive) {
+          remote = { alive: p.alive, motion: new RemoteMotion() };
+          this.remote.set(p.id, remote);
+          remote.motion.record(p, now);
+        } else if (remoteFrame) {
+          remote.motion.record(p, now);
+        }
+        target = remote.motion.position(now, speed, p.alive ? blocked : outsideMap);
+      }
       let pos = this.positions.get(p.id) || { x: p.x, y: p.y };
-      const dx = p.x - pos.x,
-        dy = p.y - pos.y,
-        blend = Math.hypot(dx, dy) > 150 ? 1 : Math.min(1, dt * 18);
+      const dx = target.x - pos.x,
+        dy = target.y - pos.y,
+        blend = p.id !== playerId || local || Math.hypot(dx, dy) > 150
+          ? 1 : Math.min(1, dt * 18);
       pos = { x: pos.x + dx * blend, y: pos.y + dy * blend };
       this.positions.set(p.id, pos);
       ctx.save();
@@ -340,30 +395,30 @@ export class StationRenderer {
     }
     // Keep known architecture and furniture readable. Server-filtered snapshots
     // remain authoritative for players, bodies and transient effects behind walls.
-    if (own.alive && !cameraView?.review) {
-      const radius = cameraView?.radius || data.vision_radius || 520,
-        walls = [
-          ...station.walls.filter((r) =>
-            intersects(r, {
-              x: own.x - radius,
-              y: own.y - radius,
-              width: radius * 2,
-              height: radius * 2,
-            }),
-          ),
-          ...(data.doors || []).filter((d) => d.closed).map((d) => d.bounds),
-        ];
+    if (serverOwn?.alive && !cameraView?.review) {
+      const radius = cameraView?.radius || data.vision_radius || 520;
+      const { x, y } = serverOwn;
+      const closedDoors = this.closedDoors;
       ctx.save();
       ctx.beginPath();
       ctx.rect(view.x, view.y, view.width, view.height);
       const visionKey = [
-        own.x,
-        own.y,
         radius,
-        ...(data.doors || []).filter((d) => d.closed).map((d) => d.id),
+        ...closedDoors.map((d) => d.id),
       ].join(",");
-      if (visionKey !== this.visionKey) {
+      const visionMoved = !this.visionAnchor ||
+        Math.hypot(
+          x - this.visionAnchor.x,
+          y - this.visionAnchor.y,
+        ) >= 12;
+      if (visionKey !== this.visionKey || visionMoved) {
         this.visionKey = visionKey;
+        this.visionAnchor = { x, y };
+        const area = { x: x - radius, y: y - radius, width: radius * 2, height: radius * 2 };
+        const walls = [
+          ...station.walls.filter((wall) => intersects(wall, area)),
+          ...closedDoors.map((door) => door.bounds),
+        ];
         const points: Vector2[] = [];
         for (let i = 0; i < 180; i++) {
           const angle = (i * Math.PI * 2) / 180,
@@ -374,8 +429,8 @@ export class StationRenderer {
             let low = 0,
               high = radius;
             for (const [origin, delta, min, max] of [
-              [own.x, dx, r.x, r.x + r.width],
-              [own.y, dy, r.y, r.y + r.height],
+              [x, dx, r.x, r.x + r.width],
+              [y, dy, r.y, r.y + r.height],
             ]) {
               if (Math.abs(delta) < 1e-8) {
                 if (origin < min || origin > max) {
@@ -391,7 +446,7 @@ export class StationRenderer {
             }
             if (high >= low && low >= 0) distance = Math.min(distance, low);
           }
-          points.push({ x: own.x + dx * distance, y: own.y + dy * distance });
+          points.push({ x: x + dx * distance, y: y + dy * distance });
         }
         this.visionPoints = points;
       }
