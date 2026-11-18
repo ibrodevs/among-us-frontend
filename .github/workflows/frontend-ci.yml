@@ -46,7 +46,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: ibrodevs/among-us-backend
-          ref: main
+          # Test the paired backend performance branch in this PR.
+          # Ordinary main/other PR CI continues to test backend main.
+          ref: ${{ github.head_ref == 'perf/crewmate-x' && 'perf/crewmate-x' || 'main' }}
           path: backend
       - uses: actions/setup-python@v5
         with:
