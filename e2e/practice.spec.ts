@@ -1,0 +1,30 @@
+import { test, expect } from "@playwright/test";
+
+test("solo walk opens without a guest or API and supports movement and map pause", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.route("**/api/**", (route) => route.abort());
+  await page.goto("/");
+  await page.getByRole("link", { name: "Одиночная прогулка по карте" }).click();
+  await expect(page.getByRole("heading", { name: "ASTERION · Одиночная прогулка" })).toBeVisible();
+  await expect(page.locator("canvas")).toBeVisible();
+  await page.keyboard.press("KeyM");
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  const marker = dialog.locator('circle[fill="#71f4de"]');
+  const x = Number(await marker.getAttribute("cx"));
+  const y = Number(await marker.getAttribute("cy"));
+  await page.keyboard.down("ArrowRight");
+  await page.waitForTimeout(300);
+  await page.keyboard.up("ArrowRight");
+  await expect(marker).toHaveAttribute("cx", String(x));
+  await expect(marker).toHaveAttribute("cy", String(y));
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await page.keyboard.down("ArrowRight");
+  await page.waitForTimeout(300);
+  await page.keyboard.up("ArrowRight");
+  await page.keyboard.press("KeyM");
+  await expect(marker).not.toHaveAttribute("cx", String(x));
+  expect(errors).toEqual([]);
+});

@@ -3,6 +3,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { ApiError, gameApi } from "@/lib/api";
 import { clearGuest, readGuest } from "@/lib/guest";
+import { forgetRoom, rememberRoom } from "@/lib/room-session";
 import { sound } from "@/features/audio/events";
 import { ColorPicker } from "@/features/game/components/ColorPicker";
 import { RoomSettings } from "@/features/game/components/RoomSettings";
@@ -36,6 +37,7 @@ export default function LobbyPage() {
       try {
         const result = await gameApi.getRoom(guest!.token, code);
         if (!active) return;
+        rememberRoom(guest!, result.code);
         if (
           previousCount.current &&
           previousCount.current !== result.players.length
@@ -50,6 +52,7 @@ export default function LobbyPage() {
         setError("");
         if (result.status !== "waiting") router.replace("/game/" + code);
       } catch (cause) {
+        if (cause instanceof ApiError && [403, 404].includes(cause.status)) forgetRoom(code);
         if (cause instanceof ApiError && cause.status === 401) {
           clearGuest();
           router.replace("/");
@@ -71,6 +74,16 @@ export default function LobbyPage() {
     };
   }, [code, router]);
   const guest = readGuest();
+  const me = room?.players.find((p) => p.id === guest?.player_id);
+  const allReady = !!room?.players.length && room.players.every((p) => p.is_ready);
+  async function toggleReady() {
+    if (!guest || !me) return;
+    setBusy(true);
+    setError("");
+    try { setRoom(await gameApi.setReady(guest.token, code, !me.is_ready)); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "Ошибка готовности"); }
+    finally { setBusy(false); }
+  }
   async function start() {
     if (!guest) return;
     setBusy(true);
@@ -155,6 +168,7 @@ export default function LobbyPage() {
                     <p className="muted">
                       {player.is_host ? "Хозяин" : "Участник"} ·{" "}
                       {player.is_connected ? "Онлайн" : "Переподключается"}
+                      {" · "}{player.is_ready ? "Готов ✓" : "Не готов"}
                     </p>
                   </div>
                 </article>
@@ -162,13 +176,17 @@ export default function LobbyPage() {
             </div>
             <p role="status">
               {room.players.length >= room.min_players
-                ? "Комната готова к старту"
+                ? allReady ? "Все готовы к старту" : `Готовы: ${room.players.filter((p) => p.is_ready).length} / ${room.players.length}. Ждём подтверждения каждого игрока.`
                 : `Для ${Number(room.settings?.impostor_count) || 2} предателей требуется минимум ${room.min_players} игроков`}
             </p>
+            <p className="muted">После изменения настроек нужно подтвердить готовность заново.</p>
+            <button className="action secondary" disabled={busy || !me} aria-pressed={!!me?.is_ready} onClick={() => void toggleReady()}>
+              {me?.is_ready ? "Отменить готовность" : "Я готов"}
+            </button>
             {room.host_player_id === guest?.player_id && (
               <button
                 className="action"
-                disabled={busy || room.players.length < room.min_players}
+                disabled={busy || room.players.length < room.min_players || !allReady}
                 onClick={() => void start()}
               >
                 Начать игру

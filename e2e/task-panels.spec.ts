@@ -53,6 +53,12 @@ test("all 20 real task panels submit through WebSocket to Django validators", as
         code = (await post("/api/v1/rooms/", { max_players: 4,impostor_count:1 }, g.token)).code;
       else await post("/api/v1/rooms/join/", { code }, g.token);
     }
+    for (const guest of guests) {
+      const ready = await request.patch(api + `/api/v1/rooms/${code}/ready/`, {
+        headers: { Authorization: "Guest " + guest.token }, data: { is_ready: true },
+      });
+      expect(ready.ok()).toBeTruthy();
+    }
     await post(`/api/v1/games/${code}/start/`, {}, guests[0].token);
     let own: OwnState | null = null;
     let crewIndex = -1;

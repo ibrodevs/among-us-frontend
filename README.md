@@ -15,6 +15,10 @@ Multiplayer 2D social-deduction game inspired by the genre of Among Us. Original
 - `npm run lint` — ESLint
 - `npm run build` — production build
 
+The four classroom requirements and their verification steps are documented in
+[Assignment stages](docs/ASSIGNMENT-STAGES.md). This frontend requires the backend
+readiness migration `rooms.0005`: the lobby now waits for every player's confirmation.
+
 ## Responsibility and workflow
 - Ibro — `feature/ibro-lobby-ui`: landing, nickname/guest session, rooms and lobby, API client
 - Bayel — `feature/bayel-gameplay-ui`: game board, movement visuals, tasks, HUD, WebSocket client, meeting/voting UI

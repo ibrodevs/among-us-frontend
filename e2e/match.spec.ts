@@ -166,10 +166,9 @@ for (const count of [4, 10])
         await host.page
           .getByRole("button", { name: "Предателей: 1", exact: true })
           .click();
-        await expect(
-          host.page.getByRole("button", { name: "Начать игру", exact: true }),
-        ).toBeEnabled();
       }
+      for (const c of clients) await c.page.getByRole("button", { name: "Я готов", exact: true }).click();
+      await expect(host.page.getByRole("button", { name: "Начать игру", exact: true })).toBeEnabled();
       await host.page.getByRole("button", { name: "Начать игру" }).click();
       for (const c of clients)
         await expect
@@ -387,6 +386,7 @@ test("all three real task dialogs, kill, report, skip vote and impostor victory"
     await clients[0].page
       .getByRole("button", { name: "Предателей: 1", exact: true })
       .click();
+    for (const c of clients) await c.page.getByRole("button", { name: "Я готов", exact: true }).click();
     await expect(
       clients[0].page.getByRole("button", { name: "Начать игру" }),
     ).toBeEnabled();

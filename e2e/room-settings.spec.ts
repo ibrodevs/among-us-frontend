@@ -64,6 +64,12 @@ test("host selection syncs 1/2/3 impostors and only the host can edit", async ({
           exact: true,
         }),
       ).toBeDisabled();
+      for (const guest of guests) {
+        const ready = await request.patch(api + `/api/v1/rooms/${room.code}/ready/`, {
+          headers: { Authorization: "Guest " + guest.token }, data: { is_ready: true },
+        });
+        expect(ready.ok()).toBeTruthy();
+      }
       if (count === 1)
         await expect(
           host.getByRole("button", { name: "Начать игру", exact: true }),

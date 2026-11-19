@@ -10,6 +10,7 @@ export interface RoomPlayer {
   nickname: string;
   is_host: boolean;
   is_connected: boolean;
+  is_ready: boolean;
   color?: number|null;
 }
 export interface Room {

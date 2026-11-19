@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ApiError, gameApi } from "@/lib/api";
 import { clearGuest, ensureGuest, readGuest } from "@/lib/guest";
+import { forgetRoom, readRoomSession, rememberRoom } from "@/lib/room-session";
 
 export default function HomePage() {
   const router = useRouter();
@@ -11,10 +12,32 @@ export default function HomePage() {
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [savedCode, setSavedCode] = useState<string | null>(null);
 
   useEffect(() => {
     setNickname(readGuest()?.nickname || "");
+    setSavedCode(readRoomSession(readGuest()));
   }, []);
+
+  async function resume() {
+    const guest = readGuest();
+    if (!guest || !savedCode) return;
+    setBusy(true);
+    setError("");
+    try {
+      const room = await gameApi.getRoom(guest.token, savedCode);
+      router.push((room.status === "waiting" ? "/room/" : "/game/") + room.code);
+    } catch (cause) {
+      if (cause instanceof ApiError && [401, 403, 404].includes(cause.status)) {
+        forgetRoom(savedCode);
+        setSavedCode(null);
+        if (cause.status === 401) clearGuest();
+        setError("Сохранённая сессия недоступна. Создай комнату или войди по коду.");
+      } else {
+        setError("Не удалось восстановить связь. Попробуй ещё раз — сессия сохранена.");
+      }
+    } finally { setBusy(false); }
+  }
 
   async function run(mode: "create" | "join") {
     setBusy(true);
@@ -30,6 +53,7 @@ export default function HomePage() {
         mode === "create"
           ? await gameApi.createRoom(guest.token)
           : await gameApi.joinRoom(guest.token, code.trim().toUpperCase());
+      rememberRoom(guest, room.code);
       router.push("/room/" + room.code);
     } catch (cause) {
       if (cause instanceof ApiError && cause.status === 401) clearGuest();
@@ -71,6 +95,11 @@ export default function HomePage() {
               <br />и вычислите того, кто играет против вас.
             </p>
             <div className="stack" aria-busy={busy}>
+              {savedCode && (
+                <button className="action secondary" disabled={busy} onClick={() => void resume()}>
+                  Продолжить сессию · {savedCode}
+                </button>
+              )}
               <label htmlFor="nickname">Как тебя зовут, капитан?</label>
               <input
                 autoComplete="nickname"
@@ -123,7 +152,7 @@ export default function HomePage() {
         </section>
         <p style={{ textAlign: "center" }}>
           <Link className="action secondary" href="/demo/asterion">
-            Исследовать Asterion · демо карты
+            Одиночная прогулка по карте →
           </Link>
         </p>
         <div className="facts">

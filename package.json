@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test src/features/game/engine/engine.test.ts src/features/game/network/state.test.ts src/features/audio/audio.test.ts",
+    "test": "tsx --test src/features/game/engine/engine.test.ts src/features/game/network/state.test.ts src/features/audio/audio.test.ts src/lib/room-session.test.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

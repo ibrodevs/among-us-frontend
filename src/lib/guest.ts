@@ -1,5 +1,6 @@
 import { gameApi } from "@/lib/api";
 import type { GuestSession } from "@/lib/types";
+import { forgetRoom } from "./room-session";
 
 const KEY = "crew-mission-guest-v1";
 export function readGuest(): GuestSession | null {
@@ -9,13 +10,14 @@ export function readGuest(): GuestSession | null {
     return value?.token && value.player_id && value.nickname ? value : null;
   } catch { return null; }
 }
-export function clearGuest() { localStorage.removeItem(KEY); }
+export function clearGuest() { localStorage.removeItem(KEY); forgetRoom(); }
 export async function ensureGuest(nickname: string): Promise<GuestSession> {
   const normalized = nickname.trim();
   if (normalized.length < 2 || normalized.length > 16) throw new Error("Имя должно содержать 2–16 символов");
   const existing = readGuest();
   if (existing?.nickname === normalized) return existing;
   const guest = await gameApi.createGuest(normalized);
+  forgetRoom();
   localStorage.setItem(KEY, JSON.stringify(guest));
   return guest;
 }

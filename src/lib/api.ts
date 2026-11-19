@@ -1,5 +1,6 @@
 import { API_BASE } from "@/lib/config";
 import type { ApiErrorPayload, GuestSession, Room } from "@/lib/types";
+import { forgetRoom } from "./room-session";
 
 export class ApiError extends Error {
   constructor(
@@ -49,6 +50,10 @@ async function api<T>(
 
 type Appearance={players:{player_id:string;color:number|null}[]};
 export const gameApi = {
+  setReady: (token: string, code: string, is_ready: boolean) =>
+    api<Room>("/api/v1/rooms/" + encodeURIComponent(code) + "/ready/", {
+      token, method: "PATCH", body: { is_ready },
+    }),
  getAppearance:(token:string,code:string)=>api<Appearance>("/api/v1/rooms/"+encodeURIComponent(code)+"/appearance/",{token}),
  setAppearance:(token:string,code:string,color:number)=>api<Appearance>("/api/v1/rooms/"+encodeURIComponent(code)+"/appearance/",{token,method:"PATCH",body:{color}}),
   getSettings: (token: string, code: string) =>
@@ -80,11 +85,13 @@ export const gameApi = {
     api<Room>("/api/v1/rooms/join/", { method: "POST", token, body: { code } }),
   getRoom: (token: string, code: string) =>
     api<Room>("/api/v1/rooms/" + encodeURIComponent(code) + "/", { token }),
-  leaveRoom: (token: string, code: string) =>
-    api<void>("/api/v1/rooms/" + encodeURIComponent(code) + "/leave/", {
+  leaveRoom: async (token: string, code: string) => {
+    await api<void>("/api/v1/rooms/" + encodeURIComponent(code) + "/leave/", {
       method: "POST",
       token,
-    }),
+    });
+    forgetRoom(code);
+  },
   startGame: (token: string, code: string) =>
     api<Room>("/api/v1/games/" + encodeURIComponent(code) + "/start/", {
       method: "POST",

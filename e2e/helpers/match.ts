@@ -58,6 +58,8 @@ export async function match(
     guests[0].token,
     "PATCH",
   );
+  for (const guest of guests)
+    await post(`/api/v1/rooms/${code}/ready/`, { is_ready: true }, guest.token, "PATCH");
   await post(`/api/v1/games/${code}/start/`, {}, guests[0].token);
   for (const guest of guests) {
     const context = await browser.newContext({

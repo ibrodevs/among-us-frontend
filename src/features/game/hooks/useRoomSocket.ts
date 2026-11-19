@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Room } from "@/lib/types";
 import { WS_BASE } from "@/lib/config";
 import { readGuest } from "@/lib/guest";
+import { forgetRoom, rememberRoom } from "@/lib/room-session";
 import { acceptSnapshot } from "../network/types";
 import type {
   Command,
@@ -74,6 +75,8 @@ export function useRoomSocket(code: string) {
             }
           }, 15000);
         } else if (message.type === "room.snapshot") {
+          if (message.room.players.some((p: Room["players"][number]) => p.id === guest!.player_id))
+            rememberRoom(guest!, message.room.code);
           setRoom(message.room);
         } else if (
           message.type === "game.snapshot" &&
@@ -104,6 +107,7 @@ export function useRoomSocket(code: string) {
         clearInterval(heartbeat);
         if (disposed) return;
         if (event.code === 4401) {
+          forgetRoom(code);
           setStatus("unauthorized");
           return;
         }
